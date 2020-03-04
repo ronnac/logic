@@ -1,4 +1,7 @@
 (ns logic-baldridge.episode1)
+;; https://tbaldridge.pivotshare.com/categories/logic-programming/1630/media
+;; or
+;; https://www.youtube.com/playlist?list=PLhi8pL3xn1OSlyhqnqFmH8il3z_LiYGza
 
 (defn lvar
 	([] (lvar ""))
@@ -12,7 +15,7 @@
     (if (lvar? pr)
 			(recur s pr)
 			pr)
-		pr))
+		s))
 
 (defn unify [s u v]
 	(let [u (walk s u)
@@ -25,12 +28,13 @@
 		(lvar? v) (assoc s v u)
 		:else (and (= u v) s))))
 
-(let [s (lvar "s") ])
-	(walk {} (lvar "s"))
+(let [s (lvar "s") ]
+	(walk {} s));; => {}
 
 (let [s (lvar "s")
-				v (lvar "y")]
+      v (lvar "y")]
 	(walk {s v v 42} s))
+;; => 42
 	
 (unify {} (lvar "s") 42)
 
