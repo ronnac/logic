@@ -5,7 +5,7 @@
 
 (defn lvar
 	([] (lvar ""))
-	([nm] (gensym (str nm "_"))))
+	([lvname] (gensym (str lvname "_"))))
 
 (defn lvar? [v]
 	(symbol? v))
@@ -15,7 +15,7 @@
     (if (lvar? pr)
 			(recur s pr)
 			pr)
-		s))
+		u))
 
 (defn unify [s u v]
 	(let [u (walk s u)
@@ -29,7 +29,8 @@
 		:else (and (= u v) s))))
 
 (let [s (lvar "s") ]
-	(walk {} s));; => {}
+	(walk {} s))
+;; => s_12443
 
 (let [s (lvar "s")
       v (lvar "y")]
@@ -37,15 +38,13 @@
 ;; => 42
 
 (unify {} (lvar "s") 42)
-;; => {}
-
-(let [s (lvar "s")
-      v (lvar "v")]
-  (walk {s v v 42} s))
-;; => 42
+;; => {s_12450 42}
 
 (unify {} (lvar "s") (lvar "v"))
-;; => {}
+;; => {s_12453 v_12454}
+
+(unify {} 1 2)
+;; => false
 
 (unify {} 1 1)
 ;; => {}
@@ -58,11 +57,15 @@
 ;; => #'logic-baldridge.episode1/==
 
 ((== 1 2) {})
+;; => []
+
+((== 1 1) {})
 ;; => [{}]
+
 ((== (lvar "foo") 1) {})
-;; => [{}]
+;; => [{foo_12471 1}]
+
 ((== (lvar "foo") 1) {})
-;; => [{}]
 
 (defn -conj
 	( [a] a)
@@ -76,10 +79,13 @@
 	( [a b & more]
 		(-conj a (apply -conj b more))))
 
-((-conj
-	(== b a)
-	(== a 42)
-	(== 1 2)) {}))
+(let [a (lvar "a")
+      b (lvar "b")]
+  ((-conj
+    (== b a)
+    (== a 42)
+    (== 1 2)) {}))
+;; => ()
 
 (defn -disj [& goals]
     (fn [s]
@@ -88,10 +94,10 @@
 				goals)))
 
 (let [a (lvar "a")
-        b (lvar "b")]
+      b (lvar "b")]
     ((-disj (conj
-    					 		(== b a}
-				         (== a 42)
-								(== 1 2))
-								(== b 11)) {}))
+              (== b a)
+              (== a 42)
+              (== 1 2))
+            (== b 11)) {}))
  
