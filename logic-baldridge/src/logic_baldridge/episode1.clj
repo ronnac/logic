@@ -90,12 +90,12 @@
 (defn -disj [& goals]
     (fn [s]
 			(mapcat (fn [goal]
-											 (goal s))
-				goals)))
+                (goal s))
+          goals)))
 
 (let [a (lvar "a")
       b (lvar "b")]
-    ((-disj (conj
+    ((-disj (-conj
               (== b a)
               (== a 42)
               (== 1 2))
