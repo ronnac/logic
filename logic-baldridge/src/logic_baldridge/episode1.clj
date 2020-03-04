@@ -3,13 +3,21 @@
 ;; or
 ;; https://www.youtube.com/playlist?list=PLhi8pL3xn1OSlyhqnqFmH8il3z_LiYGza
 
+;; An example logic engine based on mukanren
+;; http://webyrd.net/scheme-2013/papers/HemannMuKanren2013.pdf
+
 (defn lvar
 	([] (lvar ""))
-	([lvname] (gensym (str lvname "_"))))
+	([nm] (gensym (str nm "_"))))   ; nm ... name of the lvar
 
+;; Check if a given Var is an lvar (logic variable)
+;; For the sake of this demo it shall be enough to check whether it is a symbol
 (defn lvar? [v]
 	(symbol? v))
 
+;; The walk operator searches for a variable's value in the
+;; substitution. When a non-variable term is walked,
+;; the term itself is returned. 
 (defn walk [s u]
 	(if-let [pr (get s u)]
     (if (lvar? pr)
@@ -19,7 +27,7 @@
 
 (defn unify [s u v]
 	(let [u (walk s u)
-					v (walk s v)]
+        v (walk s v)]
 		(cond
 			(and (lvar? u)
 			(lvar? v)
