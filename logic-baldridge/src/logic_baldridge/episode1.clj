@@ -35,25 +35,34 @@
       v (lvar "y")]
 	(walk {s v v 42} s))
 ;; => 42
-	
+
 (unify {} (lvar "s") 42)
+;; => {}
 
 (let [s (lvar "s")
-v (lvar "v")]
-(walk {s v v 42} s))
-(unify { (lvar "s") (lvar "v"))
+      v (lvar "v")]
+  (walk {s v v 42} s))
+;; => 42
 
-(unify {} 1 1)|
+(unify {} (lvar "s") (lvar "v"))
+;; => {}
+
+(unify {} 1 1)
+;; => {}
 
 (defn == [a b]
 	(fn [s]
 		(if-let [v (unify s a b)]
 			[v]
 			[])))
+;; => #'logic-baldridge.episode1/==
 
 ((== 1 2) {})
+;; => [{}]
 ((== (lvar "foo") 1) {})
+;; => [{}]
 ((== (lvar "foo") 1) {})
+;; => [{}]
 
 (defn -conj
 	( [a] a)
