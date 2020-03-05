@@ -1,18 +1,29 @@
 (ns reasoned-schemer.ch1
   (:refer-clojure :exclude [==])
-  (:use [clojure.core.logic]))
+  (:use [clojure.core.logic])
+  (:use [serializable.fn]))
 
+
+
+;; #function[clojure.core.logic/fail]
 u#
+
+;; #function[clojure.core.logic/succeed]
 s#
 
 (run* (q) u#)
+;; => ()
+
 (run* (q) s#)
+;; => (_0)
 
 (run* (q) (== true q))
+;; => (true)
 
 (run* (q)
       u#
       (== true q))
+;; => ()
 
 (run* (r)
       s#
