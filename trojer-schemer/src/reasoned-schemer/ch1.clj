@@ -165,20 +165,20 @@ s#
       (== true q))
 ;; => ()
 ;;The first goal (== false q) succeeds,
-;;associating #f with q; true cannot then be
-;;associated with q, since q is no longer
-;;fresh.
+;;associating false with q; true cannot
+;;then be associated with q,
+;;since q is no longer fresh.
 
 (run* (q)
       (== false q)
       (== false q))
 ;; => (false)
 ;;In order for the run to succeed, both
-;;(== false q) and (== false q) must succeed.
-;;The first goal succeeds while associating
-;;false with the fresh variable q. The second
-;;goal succeeds because although q is no longer
-;;fresh, false is already associated with it.
+;;(== false q) and (== false q) must
+;;succeed. The first goal succeeds while
+;;associating false with the fresh
+;;variable q. The second goal succeeds
+;;because although q is no longer fresh, false is already associated with it.
 
 (run* (q)
   (fresh (x)
@@ -191,17 +191,46 @@ s#
   (fresh (x)
     (== x r)))
 ;; => (_0)
-;;because r starts out fresh and then r gets
-;;whatever association that x gets, but both
-;;x and r remain fresh. When one variable
-;;is associated with another, we say they
-;;co-refer or share.
+;;because r starts out fresh and then r
+;;gets whatever association x gets, but
+;;both x and r remain fresh. When one
+;;variable is associated with another,
+;;we say they co-refer or share.
+;;            ========    =====
 
+(run* (q)
+  (fresh (x)
+    (== true x)
+    (== x q)))
+;; => (true)
+;;because q starts out fresh and then
+;;q gets x’s association.
+
+(run* (q)
+  (fresh (x)
+    (== x q)
+    (== true x)))
+;; => (true)
+;;because the first goal ensures that
+;;whatever association x gets,
+;;q also gets.
+
+(run* (q)
+  (fresh (x)
+    (== true x)
+    (== x q)))
+;; => (true)
+(run* (q)
+  (fresh (x)
+    (== true x)
+    (== x q)))
+;; => (true)
 (run* (x)
       (conde
         ((== :olive x) s#)
         ((== :oil x) s#)
         (:else u#)))
+;; => (:olive :oil)
 ;; => (:olive :oil)
 
 ; "not supported", conde stmts that are
