@@ -225,6 +225,44 @@ s#
     (== true x)
     (== x q)))
 ;; => (true)
+
+(cond
+  false true
+  :else false)
+;; => false
+;;because the question of the first
+;;cond line is false, so the value
+;;of the cond expression is determined
+;;by the answer in the second
+;;cond line.
+
+;;Which false is the value?
+;;=> The one in the "else: false"
+;cond line.
+
+(cond
+  false s#
+  :else u#)
+;; => #object[clojure.core.logic$fail
+;;it fails because the answer of the
+;;second cond line is #u.
+
+
+(run* (x)
+  (conde
+   (u# s#)
+   (:else u#)))
+;; => ()
+;;fails, because the question of the
+;;first conde line is the goal #u.
+
+
+(run* (x)
+  (conde
+   (u# s#)
+   (:else s#)))
+;; => ()
+
 (run* (x)
       (conde
         ((== :olive x) s#)
@@ -265,14 +303,14 @@ s#
 
 (run* (r)
       (fresh (x y)
-             (conde               
+             (conde
                ((== :split x) (== :pea y))
                ((== :navy x) (== :bean y)))
              (== (cons x [y]) r)))
 
 (run* (r)
       (fresh (x y)
-             (conde               
+             (conde
                ((== :split x) (== :pea y))
                ((== :navy x) (== :bean y)))
              (== (conj '(:soup) x y) r)))
