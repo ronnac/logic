@@ -100,6 +100,10 @@ s#
 ;;===================
 ;; (== v w) is the same as (== w v).
 
+(run* (x)
+      s#)
+;; => (_0)
+;;a symbol representing a fresh variable.†
 
 (run* (x)
    (let [x false]
@@ -126,6 +130,12 @@ s#
 
 (run* (r)
   (fresh (x y)
+    (== (list x y) r)))
+;; => ((_0 _1))
+;; A Clojure way of doing the same as in previous example.
+
+(run* (r)
+  (fresh (x y)
     (== (conj [] x y) r)))
 ;; => ([_0 _1])
 ;;What holds for lists (previous
@@ -142,12 +152,50 @@ s#
 ;;are still fresh, they get different
 ;;reified names.
 
+(run* (r)
+  (fresh (x)
+    (let [y x]
+      (fresh (x)
+        (== (list y x y) r)))))
+;; => ((_0 _1 _0))
+;; A Clojure way of doing the same as in previous example.
+
+(run* (q)
+      (== false q)
+      (== true q))
+;; => ()
+;;The first goal (== false q) succeeds,
+;;associating #f with q; true cannot then be
+;;associated with q, since q is no longer
+;;fresh.
+
+(run* (q)
+      (== false q)
+      (== false q))
+;; => (false)
+;;In order for the run to succeed, both
+;;(== false q) and (== false q) must succeed.
+;;The first goal succeeds while associating
+;;false with the fresh variable q. The second
+;;goal succeeds because although q is no longer
+;;fresh, false is already associated with it.
+
 (run* (q)
   (fresh (x)
      (== x q)
      (== true x)))
 ;; => (true)
 ;;because q and x are the same.
+
+(run* (r)
+  (fresh (x)
+    (== x r)))
+;; => (_0)
+;;because r starts out fresh and then r gets
+;;whatever association that x gets, but both
+;;x and r remain fresh. When one variable
+;;is associated with another, we say they
+;;co-refer or share.
 
 (run* (x)
       (conde
