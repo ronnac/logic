@@ -52,56 +52,118 @@ s#
 (run* (r)
       s#
       (== :corn r))
+;; => (:corn)
+;;because r is associated with corn
+;;when (== corn r)succeeds.
+
+(run* (r)
+  u#
+  (== :corn r))
+;; => ()
+;;because u# fails.
 
 (run* (x)
       (let [x false]
         (== true x)))
+;; => ()
+;;since false is not equal to true.
 
 (run* (q)
       (fresh (x)
              (== true x)
              (== true q)))
+;; => (true)
+;;because ‘(fresh (x ...) g .. .)’
+;;binds fresh variables to x ...
+;;and succeeds if the goals g ...
+;;succeed.
+;;(== true x) succeeds when x is fresh.
+
+;;When is a variable fresh?
+;;=> When it has no association.
+
+
 (run* (q)
       (fresh (x)
              (== true x)
              (== x q)))
+;; => (true)
+
+;;===================
+;; The Law of Fresh ;
+;;===================
+;;If x is fresh, then (≡ v x) succeeds
+;;and associates x with v.
+
+;;===================
+;; Law of ==        ;
+;;===================
+;; (== v w) is the same as (== w v).
+
 
 (run* (x)
-      (let [x false]
-        (fresh (x)
-               (== true x))))
-
-(run* (r)
-      (fresh (x y)
-             (== (cons x (cons y '())) r)))
-
-(run* (r)
-      (fresh (x y)
-             (== (conj [] x y) r)))
-
-(run* (r)
+   (let [x false]
       (fresh (x)
-             (let [y x]
-               (fresh (x)
-                      (== (cons y (cons x [y])) r)))))
+          (== true x))))
+;; => (_0)
+;;since the x in (== true x) is the one
+;;introduced by the fresh expression;
+;;it is neither the x introduced in the
+;;run expression nor the x introduced in
+;;the lambda expression.
+
+(run* (r)
+  (fresh (x y)
+    (== (cons x (cons y '())) r)))
+;; => ((_0 _1))
+;;For each different fresh variable
+;;there is a symbol with an underscore
+;;followed by a number. This entity is
+;;not a variable but rather is a way of
+;;showing that the variable was fresh.
+;;We say that such a variable has been
+;;reified.
+
+(run* (r)
+  (fresh (x y)
+    (== (conj [] x y) r)))
+;; => ([_0 _1])
+;;What holds for lists (previous
+;;exercise) also holds for vectors
+
+(run* (r)
+  (fresh (x)
+    (let [y x]
+      (fresh (x)
+        (== (cons y (cons x [y])) r)))))
+;; => ((_0 _1 _0))
+;;Within the inner fresh, x and y are
+;;different variables, and since they
+;;are still fresh, they get different
+;;reified names.
 
 (run* (q)
-      (fresh (x)
-             (== x q)
-             (== true x)))
-
-;; ---
+  (fresh (x)
+     (== x q)
+     (== true x)))
+;; => (true)
+;;because q and x are the same.
 
 (run* (x)
       (conde
         ((== :olive x) s#)
         ((== :oil x) s#)
-        (:else u#)))            ;; "not supported", conde stmts that are guaranteed to fail is not needed
+        (:else u#)))
+;; => (:olive :oil)
+
+; "not supported", conde stmts that are
+;;guaranteed to fail are not needed
 
 (run 1 (x)
       (conde
         ((== :olive x) s#)
         ((== :oil x) s#)))
+;; => (:olive)
 
 (run* (x)
       (conde
