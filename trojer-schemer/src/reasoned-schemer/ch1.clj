@@ -3,22 +3,50 @@
   (:use [clojure.core.logic])
   (:use [serializable.fn]))
 
+;; differences from
+;; "The reasoned schemer"
+;;https://github.com/clojure/core.logic/wiki/Differences-from-The-Reasoned-Schemer
 
-;;In order to do relational programming,
-;;we need only two constants:
+;;Read first paragraphs of http://www.clojure.net/2012/10/02/More-core.logic/
+;;for a concise definition of "goals":
+;;"when you unify two things, you
+;;establish a relationship between then.
+;;A collection of these relationships is
+;;called a ‘substitution’. A goal is a
+;;function that takes a substitution
+;;as a parameter and adds one or more
+;;relationships to it."
+
+;;TRS (The Reasoned Schemer):
+;;"In order to do relational program-
+;;ming,we need only two constants:
 ;;  #s and #u,
 ;;and only three operators:
-;;  ==, fresh, and conde.
+;;  ==, fresh, and conde."
+;;core.logic:
+;;s# and ué are functions, not constants
 
-;;#s and #u are reminiscent of the
-;;Boolean constants: #t and #f in Scheme
+;;" #s and #u are reminiscent of the
+;;Boolean constants #t and #f in Scheme"
 
 ;; #function[clojure.core.logic/fail]
 ;; or Unsuccesful
 u#
 
+;; (source fail)
+;; (defn fail
+;;   "A goal that always fails."
+;;   [a] nil)
+
 ;; #function[clojure.core.logic/succeed]
 s#
+
+;; (source s#)
+;; (def s# succeed)
+;; (source succeed)
+;; (defn succeed
+;;   "A goal that always succeeds."
+;;   [a] a)
 
 (run* (q) u#)
 ;; => ()
@@ -54,7 +82,7 @@ s#
       (== :corn r))
 ;; => (:corn)
 ;;because r is associated with corn
-;;when (== corn r)succeeds.
+;;when (== corn r) succeeds.
 
 (run* (r)
   u#
@@ -73,7 +101,7 @@ s#
              (== true x)
              (== true q)))
 ;; => (true)
-;;because ‘(fresh (x ...) g .. .)’
+;;because ‘(fresh (x ...) g ...)’
 ;;binds fresh variables to x ...
 ;;and succeeds if the goals g ...
 ;;succeed.
@@ -81,7 +109,6 @@ s#
 
 ;;When is a variable fresh?
 ;;=> When it has no association.
-
 
 (run* (q)
       (fresh (x)
@@ -103,7 +130,7 @@ s#
 (run* (x)
       s#)
 ;; => (_0)
-;;a symbol representing a fresh variable.†
+;;a symbol representing a fresh variable
 
 (run* (x)
    (let [x false]
@@ -132,7 +159,8 @@ s#
   (fresh (x y)
     (== (list x y) r)))
 ;; => ((_0 _1))
-;; A Clojure way of doing the same as in previous example.
+;;A Clojurey way of doing the same as in
+;;previous example.
 
 (run* (r)
   (fresh (x y)
@@ -158,7 +186,8 @@ s#
       (fresh (x)
         (== (list y x y) r)))))
 ;; => ((_0 _1 _0))
-;; A Clojure way of doing the same as in previous example.
+;;A Clojurey way of doing the same as in
+;;previous example.
 
 (run* (q)
       (== false q)
@@ -178,7 +207,8 @@ s#
 ;;succeed. The first goal succeeds while
 ;;associating false with the fresh
 ;;variable q. The second goal succeeds
-;;because although q is no longer fresh, false is already associated with it.
+;;because although q is no longer fresh,
+;;false is already associated with it.
 
 (run* (q)
   (fresh (x)
@@ -215,17 +245,6 @@ s#
 ;;whatever association x gets,
 ;;q also gets.
 
-(run* (q)
-  (fresh (x)
-    (== true x)
-    (== x q)))
-;; => (true)
-(run* (q)
-  (fresh (x)
-    (== true x)
-    (== x q)))
-;; => (true)
-
 (cond
   false true
   :else false)
@@ -244,31 +263,70 @@ s#
   false s#
   :else u#)
 ;; => #object[clojure.core.logic$fail
-;;it fails because the answer of the
-;;second cond line is #u.
+;;"it fails because the answer of the
+;;second cond line is #u."
+;;This example of The reasoned schemer
+;;doesn't work in core.logic
+;;because s# and u# are functions.
 
+;;====================================
+;;
+;; TRS p. 11 - conde
+;
+;;"Clojure core.logic's conde is
+;; actually the book's condi.
+;; Core.logic offers no conde as is
+;; presented in the book."
+;;"conde does not support defining
+;; an else clau ...se. Just use a (s# ...)
+;; at the end of your conde."
+
+;;(source conde)
+;;(defmacro conde
+;;"Logical disjunction of the clauses.
+;; The first goal in a clause is
+;; considered the head of that clause.
+;; Interleaves the execution of the
+;; clauses. ..."
+
+(conde
+   (u# s#)
+   (s# u#)) ;; s# iso. else
+;; => #function[reasoned-schemer.ch1/eval15701/fn--15702]
+
+;;TRS: conde fails, because the question
+;;of the first conde line is the goal #u
+;;hence run* returns an empy list
 
 (run* (x)
   (conde
-   (u# s#)
-   (:else u#)))
-;; => ()
-;;fails, because the question of the
-;;first conde line is the goal #u.
-
+   [u# s#]
+   [s# s#]));; s# iso. else
+;; => (_0)
 
 (run* (x)
   (conde
-   (u# s#)
-   (:else s#)))
+   (s# s#)
+   (s# true)))
+;; => (_0)
+
+(run* (x)
+  (conde
+   (s# u#)
+   (:else true)))
 ;; => ()
+
+(run* (x)
+  (conde
+   (s# (== x 1))
+   (:else true)))
+;; => (1)
 
 (run* (x)
       (conde
         ((== :olive x) s#)
         ((== :oil x) s#)
         (:else u#)))
-;; => (:olive :oil)
 ;; => (:olive :oil)
 
 ; "not supported", conde stmts that are
@@ -351,3 +409,6 @@ s#
       (let [a (== true q)
             b (== false q)]        
         b))
+;; => (false)
+;; => (false)
+;; => (false)
