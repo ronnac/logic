@@ -48,6 +48,18 @@ s#
 ;;   "A goal that always succeeds."
 ;;   [a] a)
 
+;;====================================
+;; In core.logic, the use of s# and u#
+;; outside of run or run* has no sense.
+;;====================================
+
+(s# nil)
+;; => nil
+(run* (q) (s# u#))
+;; => ()
+(run* (q) (u# s# u#))                   ;;Wrong number of args (2) passed to:
+;;clojure.core.logic/fail;
+
 (run* (q) u#)
 ;; => ()
 ;;since #u fails, and because the
@@ -87,6 +99,12 @@ s#
 (run* (r)
   u#
   (== :corn r))
+;; => ()
+;;because u# fails.
+
+(run* (r)
+  (== :corn r)
+  u#)
 ;; => ()
 ;;because u# fails.
 
@@ -304,6 +322,24 @@ s#
    [s# s#]));; s# iso. else
 ;; => (_0)
 
+
+(run* (x)
+  (conde
+   [u# s# s#]
+   [s# s# s# s#]));; s# iso. else
+;; => (_0)
+
+
+(run* (x)
+  (conde
+   (u# s# s#)
+   (s# s# s# s#)));; s# iso. else
+;; => (_0)
+
+(run* (x)
+  (conde
+   [u# s#]
+   [s# s#]));; s# iso. else
 (run* (x)
   (conde
    (s# s#)
@@ -315,6 +351,8 @@ s#
    (s# u#)
    (:else true)))
 ;; => ()
+;; the keyword :else shouldn't be used
+;; in cote.logic's conde
 
 (run* (x)
   (conde
