@@ -123,7 +123,7 @@ s#
 
 
 ;;====================================
-;; TRS p. 5 - run*
+;; TRS p. 5 - run*, == (unify)
 ;;====================================
 
 ;;The 1st exercise is a duplicate of
@@ -157,6 +157,21 @@ s#
 ;;returns a nonempty list if its goals
 ;;succeed.
 
+;;Does (== false x) succeed?
+;;=> it depends:
+(run* (x) (== false false))
+;; => (_0) (succeeds)
+(run* (q) (== false true))
+;; => ()   (fails)
+(run* (x) (== false nil))
+;; => ()   (fails)
+(run* (x) (== false "hey"))
+;; => ()   (fails)
+
+;;====================================
+;; TRS p. 6 - == (unify)
+;;====================================
+
 (run* (x)
       (let [x false]
         (== true x)))
@@ -178,11 +193,11 @@ s#
 ;;=> When it has no association.
 
 (run* (q)
-      (fresh (x)
-             (== true x)
-             (== x q)))
+  (fresh (x)
+    (== true x)
+    (== x q)))
 ;; => (true)
-
+;; Both q and x start out fresh.
 
 ;;====================================
 ;; TRS p. 7 - fresh, ==
@@ -194,6 +209,22 @@ s#
 ;;If x is fresh, then (≡ v x) succeeds
 ;;and associates x with v.
 
+(run* (q)
+  (fresh (x)
+    (== x true)
+    (== true q)))
+;; => (true)
+;;because the order of arguments to ==
+;;does not matter.
+
+(run* (q)
+  (fresh (x)
+    (== x true)
+    (== q true)))
+;; => (true)
+;;because the order of arguments to ==
+;;does not matter
+.
 ;;===================
 ;; Law of ==        ;
 ;;===================
@@ -204,10 +235,15 @@ s#
 ;; => (_0)
 ;;a symbol representing a fresh variable
 
+
+;;====================================
+;; TRS p. 8 - fresh, ==
+;;====================================
+
 (run* (x)
-   (let [x false]
-      (fresh (x)
-          (== true x))))
+  (let [x false]
+    (fresh (x)
+      (== true x))))
 ;; => (_0)
 ;;since the x in (== true x) is the one
 ;;introduced by the fresh expression;
@@ -261,26 +297,43 @@ s#
 ;;A Clojurey way of doing the same as in
 ;;previous example.
 
+(run* (r)
+  (fresh (x)
+    (let [y x]
+      (fresh (x)
+        (== (list  x y x) r)))))
+;; => ((_0 _1 _0))
+;; x and y are different variables, and
+;; since they are still fresh, they get
+;; different reified names. Reifying r’s
+;; value reifies the fresh variables in
+;; the order in which they appear in
+;; the list.
+
+;;====================================
+;; TRS p. 9 - == (unify)
+;;====================================
+
 (run* (q)
       (== false q)
       (== true q))
 ;; => ()
-;;The first goal (== false q) succeeds,
-;;associating false with q; true cannot
-;;then be associated with q,
-;;since q is no longer fresh.
+;; The first goal (== false q) succeeds,
+;; associating false with q; true cannot
+;; then be associated with q,
+;; since q is no longer fresh.
 
 (run* (q)
       (== false q)
       (== false q))
 ;; => (false)
-;;In order for the run to succeed, both
-;;(== false q) and (== false q) must
-;;succeed. The first goal succeeds while
-;;associating false with the fresh
-;;variable q. The second goal succeeds
+;; In order for the run to succeed, both
+;; (== false q) and (== false q) must
+;; succeed. The 1st goal succeeds while
+;; associating false with the fresh
+;; variable q. The 2nd goal succeeds
 ;;because although q is no longer fresh,
-;;false is already associated with it.
+;; false is already associated with it.
 
 (run* (q)
   (fresh (x)
@@ -316,6 +369,11 @@ s#
 ;;because the first goal ensures that
 ;;whatever association x gets,
 ;;q also gets.
+
+
+;;====================================
+;; TRS p. 10 ==, cond
+;;====================================
 
 (cond
   false true
@@ -361,12 +419,12 @@ s#
 ;; Interleaves the execution of the
 ;; clauses. ..."
 
-(conde
+(run* (q)
+  (conde
    (u# s#)
-   (s# u#)) ;; s# iso. else
-;; => #function[reasoned-schemer.ch1/eval15701/fn--15702]
-
-;;TRS: conde fails, because the question
+   (s# u#))) ;; s# iso. else
+;; => ()
+;;conde fails, because the question
 ;;of the first conde line is the goal #u
 ;;hence run* returns an empy list
 
@@ -376,24 +434,19 @@ s#
    [s# s#]));; s# iso. else
 ;; => (_0)
 
-
 (run* (x)
   (conde
    [u# s# s#]
    [s# s# s# s#]));; s# iso. else
 ;; => (_0)
 
-
 (run* (x)
   (conde
    (u# s# s#)
    (s# s# s# s#)));; s# iso. else
 ;; => (_0)
+;; conde accepts forms or vectors
 
-(run* (x)
-  (conde
-   [u# s#]
-   [s# s#]));; s# iso. else
 (run* (x)
   (conde
    (s# s#)
@@ -406,13 +459,23 @@ s#
    (:else true)))
 ;; => ()
 ;; the keyword :else shouldn't be used
-;; in cote.logic's conde
+;; in core.logic's conde
 
 (run* (x)
   (conde
    [s# (== 3 1)]
    [(== x 2)]))
 ;; => (2)
+
+;;==================================
+;; The Law of conde
+;;==================================
+;; To get more values from conde,
+;; pretend that the successful conde
+;; line has failed, refreshing all
+;; variables that got an association
+;; from that line.
+;;==================================
 
 (run* (x)
       (conde
@@ -502,6 +565,7 @@ s#
       (let [a (== true q)
             b (== false q)]        
         b))
+;; => (false)
 ;; => (false)
 ;; => (false)
 ;; => (false)
