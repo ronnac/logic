@@ -108,8 +108,26 @@ s#
 ;; => ()
 ;;because the expression
 ;;(run∗ (q) g ... (== true q))
-;;has the value (
+;;has the value ()
 ;;if the goals g . . . fail.
+
+(run* (q)
+  s#
+  (== true q))
+;; => (true)
+;;(a Boolean† value),
+;;because the expression
+;; (run* (q) g . . . (== true q))
+;;associates true with q if the goals
+;;g . . . and (== true q) succeed.
+
+
+;;====================================
+;; TRS p. 5 - run*
+;;====================================
+
+;;The 1st exercise is a duplicate of
+;;the last one on the previous page.
 
 (run* (r)
       s#
@@ -155,6 +173,11 @@ s#
              (== true x)
              (== x q)))
 ;; => (true)
+
+
+;;====================================
+;; TRS p. 7 - fresh, ==
+;;====================================
 
 ;;===================
 ;; The Law of Fresh ;
