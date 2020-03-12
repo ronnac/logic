@@ -77,6 +77,11 @@ s#
 (run* (q) (u# s# u#))                   ;;Wrong number of args (2) passed to:
 ;;clojure.core.logic/fail;
 
+;;====================================
+;; TRS p. 4 - run*
+;;====================================
+
+;; #function[clojure.core.logic/fail]
 (run* (q) u#)
 ;; => ()
 ;;since #u fails, and because the
