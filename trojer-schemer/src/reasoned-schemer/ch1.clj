@@ -130,8 +130,8 @@ s#
 ;;the last one on the previous page.
 
 (run* (r)
-      s#
-      (== :corn r))
+  s#
+  (== :corn r))
 ;; => (:corn)
 ;;because r is associated with corn
 ;;when (== corn r) succeeds.
@@ -147,6 +147,15 @@ s#
   u#)
 ;; => ()
 ;;because u# fails.
+
+
+(run* (q)
+  s#
+  (== false q))
+;; => (false)
+;;because s# succeeds and because run∗
+;;returns a nonempty list if its goals
+;;succeed.
 
 (run* (x)
       (let [x false]
