@@ -17,17 +17,34 @@
 ;;as a parameter and adds one or more
 ;;relationships to it."
 
+
+;;====================================
+;; TRS p. ix - Preface
+;;====================================
+
 ;;TRS (The Reasoned Schemer):
 ;;"In order to do relational program-
-;;ming,we need only two constants:
+;;ming, we need only two constants:
 ;;  #s and #u,
 ;;and only three operators:
 ;;  ==, fresh, and conde."
 ;;core.logic:
-;;s# and ué are functions, not constants
+;;s# and u# are functions, not constants
+;;but they always yield the same
+;;(boolean) result:
+;; nil for u# (fail)
+;; truthy for s# (succeed),
+;;hence we consider them as constants
+
 
 ;;" #s and #u are reminiscent of the
 ;;Boolean constants #t and #f in Scheme"
+
+;;====================================
+;; TRS chapter 1 - Playthings
+;;====================================
+;; TRS p. 3
+;;====================================
 
 ;; #function[clojure.core.logic/fail]
 ;; or Unsuccesful
@@ -288,9 +305,9 @@ s#
 ;;because s# and u# are functions.
 
 ;;====================================
-;;
 ;; TRS p. 11 - conde
-;
+;;====================================
+
 ;;"Clojure core.logic's conde is
 ;; actually the book's condi.
 ;; Core.logic offers no conde as is
@@ -356,9 +373,9 @@ s#
 
 (run* (x)
   (conde
-   (s# (== x 1))
-   (:else true)))
-;; => (1)
+   [s# (== 3 1)]
+   [(== x 2)]))
+;; => (2)
 
 (run* (x)
       (conde
@@ -382,6 +399,7 @@ s#
         ((== :olive x) s#)
         (s# s#)
         ((== :oil x) s#)))
+;; => (:olive _0 :oil)
 
 (run 2 (x)
       (conde
