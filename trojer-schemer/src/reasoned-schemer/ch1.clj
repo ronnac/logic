@@ -442,24 +442,24 @@ s#
 
 (run* (x)
   (conde
-   (u# s# s#)
-   (s# s# s# s#)));; s# iso. else
+   [u# s# s#]
+   [s# s# s# s#]));; s# iso. else
 ;; => (_0)
 ;; conde accepts forms or vectors
 
 (run* (x)
   (conde
-   (s# s#)
-   (s# true)))
-;; => (_0)
+   [s# s#]
+   [s# (== x true)]))
+;; => (_0 true)
 
 (run* (x)
   (conde
-   (s# u#)
-   (:else true)))
-;; => ()
+   [s# u#]
+   [:else (== x 3)]))
 ;; the keyword :else shouldn't be used
-;; in core.logic's conde
+;; in core.logic's conde, it doesn't
+;; work.
 
 (run* (x)
   (conde
@@ -479,13 +479,33 @@ s#
 
 (run* (x)
       (conde
-        ((== :olive x) s#)
-        ((== :oil x) s#)
-        (:else u#)))
+       [(== :olive x) s#]
+       [(== :oil x) s#]
+       [s# u#]))
 ;; => (:olive :oil)
 
-; "not supported", conde stmts that are
-;;guaranteed to fail are not needed
+
+(run* (x)
+  (conde
+   ((== 1 2) s#)
+   ((== false true) s#)
+   (s# (== x "I was here."))))
+;; => ("I was here.")
+;; replace else by s#
+;; parentheses iso. brackets
+;; seem to work
+
+(run* (x)
+  (conde
+   ((== 1 2) s#)
+   ((== false true) s#)
+   ((== x "I was here."))))
+;; => ("I was here.")
+;; replace else by nothing
+
+;; conde statements that are
+;; guaranteed to fail can be
+;; omitted
 
 (run 1 (x)
       (conde
@@ -500,20 +520,29 @@ s#
         (s# s#)
         ((== :oil x) s#)))
 ;; => (:olive _0 :oil)
+;; The first conde line fails.
+;; It is as if that line were not
+;; there. 
+;; (#s #s) led to _0
+;; since it succeeds without
+;; x getting an association.
 
 (run 2 (x)
       (conde
         ((== :extra x) s#)
         ((== :virgin x) u#)
         ((== :olive x) s#)
-        (s# s#)
         ((== :oil x) s#)))
+;; => (:extra :olive)
+;; since we do not want every value;
+;; we want only the first two values.
 
 (run* (r)
       (fresh (x y)
              (== :split x)
              (== :pea y)
              (== (cons x [y]) r)))
+;; => ((:split :pea))
 
 (run* (r)
       (fresh (x y)
