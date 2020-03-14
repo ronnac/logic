@@ -2,7 +2,14 @@
   (:refer-clojure :exclude [==])
   (:use [clojure.core.logic]))
 
-(run* (r)
+(let [x (fn [a] a)
+      y :c]
+  (x y))
+;; => :c
+;; because (x y) applies (fn [a] a)
+;; to :c.
+
+
       (fresh (v w)
              (== (let [x v, y w]
                    [x y]) r)))
