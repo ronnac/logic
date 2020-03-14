@@ -595,6 +595,15 @@ a
       ((fresh (x) (== y x)) (== z x)))
     (== (cons y [z]) r)))
 ;; => ((_0 _1) (_0 _1))
+;; but it looks like both occurrences of
+;;_0 have come from the same variable and
+;; similarly for both occurrences of _1
+
+
+;;====================================
+;; TRS p. 14 - conde
+;;====================================
+
 
 (run* (r)
   (fresh (x y z)
@@ -605,6 +614,7 @@ a
     (== (cons y [z]) r)))
 ;; => ((false _0) (_0 false))
 
+ 
 (run* (q)
       (let [a (== true q)
             b (== false q)]
