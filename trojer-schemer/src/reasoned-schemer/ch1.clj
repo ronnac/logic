@@ -467,6 +467,9 @@ s#
    [(== x 2)]))
 ;; => (2)
 
+;;====================================
+;; TRS p. 12 - conde
+;;====================================
 ;;==================================
 ;; The Law of conde
 ;;==================================
@@ -528,7 +531,7 @@ s#
 ;; x getting an association.
 
 ;;====================================
-;; TRS p. 12 - conde
+;; TRS p. 13 - conde
 ;;====================================
 (run 2 (x)
       (conde
@@ -564,7 +567,7 @@ s#
 ;; => ((:pea :split :soup) (:bean :navy :soup))
 
 ;;====================================
-;; TRS p. 13 - teacupo
+;; TRS p. 14 - teacupo
 ;;====================================
 
 (defn teacupo [x]
@@ -584,33 +587,34 @@ s#
       ((== false x) (== true y)))
     (== (cons x [y]) r)))
 ;;=> ((false true) (:tea true) (:cup true))
-;; From (teacup o x), x gets two associa-
-;; tions, and from (≡ #f x), x gets one
+;; From (teacupo x), x gets two associa-
+;; tions, and from (≡ false x), x gets one
 ;; association.
-a
+
 (run* (r)
   (fresh (x y z)
     (conde
       ((== y x) (fresh (x) (== z x)))
       ((fresh (x) (== y x)) (== z x)))
     (== (cons y [z]) r)))
-;; => ((_0 _1) (_0 _1))
-;; but it looks like both occurrences of
-;;_0 have come from the same variable and
+;; => ((_0 _1) (_0 _1)) 
+;; In real life you better give different
+;; names to new fresh variables.
+
+;; It looks like both occurrences of _0
+;; have come from the same variable and
 ;; similarly for both occurrences of _1
 
-
 ;;====================================
-;; TRS p. 14 - conde
+;; TRS p. 15 - conde
 ;;====================================
-
 
 (run* (r)
   (fresh (x y z)
     (conde
       ((== y x) (fresh (x) (== z x)))
       ((fresh (x) (== y x)) (== z x)))
-    (== false x)
+    ;; (== false x)
     (== (cons y [z]) r)))
 ;; => ((false _0) (_0 false))
 
