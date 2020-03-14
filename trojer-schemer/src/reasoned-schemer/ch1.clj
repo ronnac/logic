@@ -527,6 +527,9 @@ s#
 ;; since it succeeds without
 ;; x getting an association.
 
+;;====================================
+;; TRS p. 12 - conde
+;;====================================
 (run 2 (x)
       (conde
         ((== :extra x) s#)
@@ -550,6 +553,7 @@ s#
                ((== :split x) (== :pea y))
                ((== :navy x) (== :bean y)))
              (== (cons x [y]) r)))
+;; => ((:split :pea) (:navy :bean))
 
 (run* (r)
       (fresh (x y)
@@ -557,23 +561,32 @@ s#
                ((== :split x) (== :pea y))
                ((== :navy x) (== :bean y)))
              (== (conj '(:soup) x y) r)))
+;; => ((:pea :split :soup) (:bean :navy :soup))
 
-;; ----
+;;====================================
+;; TRS p. 13 - teacupo
+;;====================================
 
 (defn teacupo [x]
   (conde
     ((== :tea x) s#)
     ((== :cup x) s#)))
+;; => #'reasoned-schemer.ch1/teacupo
 
 (run* (x)
       (teacupo x))
+;; => (:tea :cup)
 
 (run* (r)
-      (fresh (x y)
-             (conde
-               ((teacupo x) (== true y) s#)
-               ((== false x) (== true y)))
-             (== (cons x [y]) r)))
+  (fresh (x y)
+    (conde
+      ((teacupo x) (== true y) s#)
+      ((== false x) (== true y)))
+    (== (cons x [y]) r)))
+;;=> ((false true) (:tea true) (:cup true))
+;; From (teacup o x), x gets two associa-
+;; tions, and from (≡ #f x), x gets one
+;; association.
 
 (run* (r)
       (fresh (x y z)
