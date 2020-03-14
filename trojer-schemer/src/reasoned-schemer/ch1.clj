@@ -587,27 +587,26 @@ s#
 ;; From (teacup o x), x gets two associa-
 ;; tions, and from (≡ #f x), x gets one
 ;; association.
+a
+(run* (r)
+  (fresh (x y z)
+    (conde
+      ((== y x) (fresh (x) (== z x)))
+      ((fresh (x) (== y x)) (== z x)))
+    (== (cons y [z]) r)))
+;; => ((_0 _1) (_0 _1))
 
 (run* (r)
-      (fresh (x y z)
-             (conde
-               ((== y x) (fresh (x) (== z x)))
-               ((fresh (x) (== y x)) (== z x)))
-             (== (cons y [z]) r)))
-
-(run* (r)
-      (fresh (x y z)
-             (conde
-               ((== y x) (fresh (x) (== z x)))
-               ((fresh (x) (== y x)) (== z x)))
-             (== false x)
-             (== (cons y [z]) r)))
+  (fresh (x y z)
+    (conde
+      ((== y x) (fresh (x) (== z x)))
+      ((fresh (x) (== y x)) (== z x)))
+    (== false x)
+    (== (cons y [z]) r)))
+;; => ((false _0) (_0 false))
 
 (run* (q)
       (let [a (== true q)
-            b (== false q)]        
+            b (== false q)]
         b))
-;; => (false)
-;; => (false)
-;; => (false)
 ;; => (false)
