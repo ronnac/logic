@@ -525,7 +525,7 @@ s#
 ;; => (:olive _0 :oil)
 ;; The first conde line fails.
 ;; It is as if that line were not
-;; there. 
+;; there.
 ;; (#s #s) led to _0
 ;; since it succeeds without
 ;; x getting an association.
@@ -617,10 +617,37 @@ s#
     ;; (== false x)
     (== (cons y [z]) r)))
 ;; => ((false _0) (_0 false))
+;; which clearly shows that the two
+;; occurrences of _0 in the previous frame
+;; represent different variables.
 
- 
 (run* (q)
-      (let [a (== true q)
-            b (== false q)]
-        b))
+  (let [a (== true q)
+        b (== false q)]
+    b))
 ;; => (false)
+;; which shows that (== true q) and
+;; (== false q) are expressions, each of
+;; whose value is a goal. But, here we only
+;; treat the (== false q) expression’s
+;; value, b, as a goal.
+
+(run* (q)
+  (let [a (== true q)
+        b (fresh (x)
+             (== x q)
+             (== false x))
+        c (conde
+            ((== true q) s#)
+            (s# (== false q)))]
+    b))
+;; => (false)
+;; which shows that (== ...), (fresh ...),
+;; and (conde ...) are expressions, each of
+;; whose value is a goal. But, here we only
+;; treat the fresh expression’s value, b,
+;; as a goal. This is indeed interesting.
+
+
+;; Now go make yourself a peanut butter and
+;; jam sandwich.
