@@ -9,32 +9,78 @@
 ;; because (x y) applies (fn [a] a)
 ;; to :c.
 
+(run* (r)
+  (fresh [y x]
+    (== [x y] r)))
+;; => ([_0 _1])
+;; because the variables in [x y] have
+;; been introduced by fresh.
 
-      (fresh (v w)
-             (== (let [x v, y w]
-                   [x y]) r)))
+(run* (r)
+  (fresh (v w)
+    (== (let [x v
+              y w]
+             [x y]) r)))
+;; => ([_0 _1])
+;; because v and w are variables introduced
+;; by fresh.
+
+(first '(:grape :raisin :pear))
+;; => :grape
+;; Scheme uses car and cdr
+;; iso. first and rest
+
+(first '(:a :c :o :r :n))
+;; => :a
 
 (run* (r)
       (firsto [:a :c :o :r :n] r))
+;; => (:a)
+
+;; => (:a)
+;; Scheme uses caro and cdro
+;; iso. firsto and resto
+
+;;===============================
+;;  page 18
+;;===============================
 
 (run* (q)
       (firsto [:a :c :o :r :n] :a)
       (== true q))
+;; => (true)
+;; because a is the first
+;; of [:a :c :o :r :n]
 
 (run* (r)
       (fresh (x y)
              (firsto [r y] x)   ;; !!!
              (== :pear x)))
+;; => (:pear)
+;; since x is associated with the first
+;; of [r y], which is the fresh variable r.
+;; Then x is associated with pear, which in
+;; turn associates r with pear.
 
+;; Here is the definition of caro.
 (defn caro [p a]
   (fresh (d)
          (== [a d] p)))
+;; => #'reasoned-schemer.ch2/caro
+;; What is unusual about this definition?
+;; Whereas first (Scheme: car) takes one
+;; argument, firsto (caro) takes two.
+
 
 (defn caro [p a]
   (== (first p) a))
+;; => #'reasoned-schemer.ch2/caro
 
-(run* (r)      
-      (caro [:a :b] r))    ;; [r fresh(d)] == [:a :b]
+(run* (r) 
+  (caro [:a :b] r))
+;; => (:a)
+
+;; [r fresh(d)] == [:a :b]
 
 (run* (r)
       (fresh (x y)
