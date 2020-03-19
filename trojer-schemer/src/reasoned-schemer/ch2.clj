@@ -79,42 +79,89 @@
 (run* (r) 
   (caro [:a :b] r))
 ;; => (:a)
-
 ;; [r fresh(d)] == [:a :b]
 
+;; What is the value of
+[ (first [:grape :raisin :pear])
+ (first [:a :b :c])]
+;; => [:grape :a]
+
 (run* (r)
-      (fresh (x y)
-             (firsto [:grape :raisin :pear] x)
-             (firsto [:a :b :c] y)
-             ;; u#
-             (== [x y] r)))
+  (fresh (x y)
+    (firsto [:grape :raisin :pear] x)
+    (firsto [:a :b :c] y)
+    ;; u#
+    (== [x y] r)))
+;; => ([:grape :a])
+;; That’s the same: ([:grape :a]).
+
+;;===============================
+;;  page 19
+;;===============================
+
+(rest [:grape :raisin :pear])
+;; => (:raisin :pear)
+;; That’s easy: ((raisin pear)).
+
+(first (rest [:a :c :o :r :n]))
+;; => :c
 
 (run* (r)
       (fresh (v)
              (resto [:a :c :o :r :n] v)
              (firsto v r)))
+;; => (:c)
+;; The process of transforming
+;; (first (rest l)) into (firsto l v) and
+;; (resto v r) is called unnesting.
+;; Some readers may recognize the
+;; similarity between unnesting and
+;; continuation-passing style.
+
+;; Here is the definition of cdro.
+;; Oh. It is almost the same as caro.
 
 (defn cdro [p d]
   (fresh (a)
          (== (cons a d) p)))
+;; => #'reasoned-schemer.ch2/cdro
 
+;;This definition also works
 (defn cdro [p d]
   (== (rest p) d))
+;; => #'reasoned-schemer.ch2/cdro
+(cons [:raisin :pear] '(:a))
+;; => ([:raisin :pear] :a)
+
+(cons
+  (rest [:grape :raisin :pear])
+  (list (first [:a :b :c])))
+;; => ((:raisin :pear) :a)
+
+(run* (r)
+  (fresh (x y)
+     (resto [:grape :raisin :pear] x)
+     (firsto [:a :b :c] y)
+     (== [x y] r))))
+;; => ([(:raisin :pear) :a])
 
 (run* (x)
       ;;(resto [:c :o :r :n] [x :r :n])
       (cdro [:c :o :r :n] [x :r :n])
       )
+;; => (:o)
 
 (run* (l)
       (fresh (x)
              (resto l [:c :o :r :n])
              (firsto l x)
              (== :a x)))
+;; => ((:a :c :o :r :n))
 
 (run* (q)
-      (cdro [:a :c :o :r :n] [:c :O :r :n])
+      (cdro [:a :c :o :r :n] [:c :o :r :n])
       (== true q))
+;; => (true)
 
 ;; ---
 
@@ -157,6 +204,7 @@
 (run* (q)
       (emptyo [:grape :raisin :pear])
       (== true q))
+;; => ()
 
 (run* (q)
       (emptyo [])
