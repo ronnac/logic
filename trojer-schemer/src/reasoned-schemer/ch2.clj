@@ -130,6 +130,7 @@
 (defn cdro [p d]
   (== (rest p) d))
 ;; => #'reasoned-schemer.ch2/cdro
+
 (cons [:raisin :pear] '(:a))
 ;; => ([:raisin :pear] :a)
 
@@ -137,6 +138,10 @@
   (rest [:grape :raisin :pear])
   (list (first [:a :b :c])))
 ;; => ((:raisin :pear) :a)
+
+;;===============================
+;;  page 20
+;;===============================
 
 (run* (r)
   (fresh (x y)
