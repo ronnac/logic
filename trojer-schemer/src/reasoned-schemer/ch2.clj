@@ -155,41 +155,69 @@
       (cdro [:c :o :r :n] [x :r :n])
       )
 ;; => (:o)
-
+;; because [:o :r :n] is the cdr of
+;; [:c :o :r :n])
+;; so x gets associated with :o.;; (
 (run* (l)
       (fresh (x)
              (resto l [:c :o :r :n])
              (firsto l x)
              (== :a x)))
 ;; => ((:a :c :o :r :n))
-
-(run* (q)
-      (cdro [:a :c :o :r :n] [:c :o :r :n])
-      (== true q))
-;; => (true)
-
-;; ---
+;; because if the rest of l is
+;; [:c :o :r :n], then l must be the
+;; vector [a :c :o :r :n] where a is
+;; the fresh variable introduced in the
+;; definition of resto. Taking the resto
+;; of l associates the first of l with
+;; x. When we associate x with :a, we
+;; also associate a, the first of l,
+;; with :a, so l is associated with the
+;; vector [:a :c :o :r :n]
 
 (run* (l)
-      (conso [:a :b :c] [:d :e] l))
+  (conso [:a :b :c] [:d :e] l))
+;; => (([:a :b :c] :d :e))
+;; since conso associates l with
+;; (cons [:a :b :c] [:d :e])
 
 (run* (x)
-      (conso x [:a :b :c] [:d :a :b :c]))
+  (conso x [:a :b :c] [:d :a :b :c]))
+;; => (:d)
+;; Since (cons :d [:a :b :c])
+;; is [:d :a :b :c]
+;; conso associates x with :d.
 
 (run* (r)
-      (fresh (x y z)
-             (== [:e :a :d x] r)
-             (conso y [:a z :c] r)))
+  (fresh (x y z)
+    (== [:e :a :d x] r)
+    (conso y [:a z :c] r)))
+;; => ([:e :a :d :c])
+;; because first we associate r with a
+;; vector whose last element is the
+;; fresh variable x. We then perform
+;; the conso, associating x with :c, z
+;; with :d, and y with :e.
+
+;;===============================
+;;  page 21
+;;===============================
 
 (run* (x)
-      (conso x [:a x :c] [:d :a x :c])
-      ;;(conso2 x [:a x :c] [:d :a x :c])
-      )
+  (conso x [:a x :c] [:d :a x :c])
+  ;;(conso2 x [:a x :c] [:d :a x :c])
+  )
+;; => (:d)
+;; preparation for the next exercise
 
 (run* (l)
       (fresh (x)
              (== [:d :a x :c] l)
              (conso x [:a x :c] l)))
+;; => ([:d :a :d :c])
+;; because l is [:d :a x :c]. Then when
+;; we conso x onto [:a x :c], we
+;; associate x with :d.
 
 (defn conso2 [a d p]
   (== (cons a d) p))
