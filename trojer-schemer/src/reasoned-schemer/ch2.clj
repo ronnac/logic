@@ -328,7 +328,76 @@
 (run* (r)
   (fresh (x y)
     (== (cons x (cons y [:salad])) r)))
+;; => ((_0 _1 :salad))
 
+;; https://github.com/clojure/core.logic/wiki/Differences-from-The-Reasoned-Schemer
+;; Clojure has no way to create pairs
+;; (sequences with improper tails). The
+;; core.logic lcons constructor fn
+;; provides this behavior. llist is a
+;; convenience macro that expands out
+;; into nested lcons expressions.
+
+(defn pair? [x]
+  (or
+   (lcons? x)
+   (and (coll? x) (seq x))))
+;; => #'reasoned-schemer.ch2/pair?
+
+(llist '(split) 'pea)
+;; => ((split) . pea)
+
+(pair? (llist '(split) 'pea))
+;; => true
+                                        ; this works
+(lcons '(split) 'pea)
+;; => ((split) . pea)
+
+(pair? (lcons '(split) 'pea))
+;; => true
+
+;;this does not really work
+(pair? '())
+;; => nil
+
+(pair? (llist 'pear nil))
+;; => (pear)
+
+(first '(pear))
+;; => pear
+
+(rest '(pear))
+;; => ()
+
+(lcons '(split) 'pea)
+;; => ((split) . pea)
+
+(def pairo (fn [p]
+             (fresh (a d)
+               (conso a d p))))
+;; => #'reasoned-schemer.ch2/pairo
+
+(run* (q)
+  (pairo (lcons q q))
+  (== true q))
+;; => (true)
+
+(run* (q)
+  (pairo '())
+  (== true q))
+;; => ()
+
+(run* (q)
+  (pairo 'pair)
+  (== true q))
+;; => ()
+
+(run* (r)
+  (pairo r))
+;; => ((_0 . _1))
+
+(run* (r)
+(pairo (lcons r 'pear)))
 (let [p (pair :pear [])]
   [p (nth p 0) (nth p 1) (.lhs p)])
 
