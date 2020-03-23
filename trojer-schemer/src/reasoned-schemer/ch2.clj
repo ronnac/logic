@@ -211,14 +211,26 @@
 ;; preparation for the next exercise
 
 (run* (l)
-      (fresh (x)
-             (== [:d :a x :c] l)
-             (conso x [:a x :c] l)))
+  (fresh (x)
+    (== [:d :a x :c] l)
+    (conso x [:a x :c] l)))
 ;; => ([:d :a :d :c])
 ;; because l is [:d :a x :c]. Then when
 ;; we conso x onto [:a x :c], we
 ;; associate x with :d.
 
+(run* (l)
+  (fresh (x)
+    (conso x [:a x :c] l)
+    (== [:d :a x :c] l)))
+;; => ((:d :a :d :c))
+;; because we cons x onto [:a x :c] and
+;; associate l with the vector
+;; [x :a x :c]. Then when we associate l
+;; with  [:d :a x :c], we associate
+;; x with d
+.
+;; Define conso using ==.
 (defn conso2 [a d p]
   (== (cons a d) p))
 
@@ -231,8 +243,33 @@
              (resto l d)
              (firsto d y)
              (== :e y)))
+;; => ((:b :e :a :n :s))
 
-;; ---
+;; l must clearly be a five element
+;; list, since s is (rest l). Since l is
+;; fresh, (resto l s) places a fresh
+;; variable in the first position of l,
+;; while associating w and [:a :n :s]
+;; with the second position and the rest
+;; of the first of l, respectively. The
+;; first variable in l gets associated
+;; with x, which in turn gets associated
+;; with b. The rest of l is a list whose
+;; first element is the variable w.That
+;; variable gets associated with y,
+;; which in turn gets associated with e.
+
+;; TRS null? is called empty?
+;; in core.logic
+(empty? [:grape :raisin :pear])
+;; => false
+
+(empty? [])
+;; => true
+
+;;===============================
+;;  page 22
+;;===============================
 
 (run* (q)
       (emptyo [:grape :raisin :pear])
@@ -242,26 +279,55 @@
 (run* (q)
       (emptyo [])
       (== true q))
+;; => (true)
 
 (run* (q)
       (emptyo q))
+;; => (()
 
+;; define emptyo using unifier
+(defn emptyo2 [x]
+   (== [] x))
+;; => #'reasoned-schemer.ch2/emptyo2
+
+(run* (q)
+  (emptyo2 [])
+  (== true q))
+;; => (true)
+;; testing emptyo2
+
+(= :pear :plum)
+;; => false
+
+(= :plum :plum)
+;; => true
+
+                                        ;; This defn is actually on page 23
+;; but we need the function now
 (defn eqo [x y]
   (== x y))
+;; => #'reasoned-schemer.ch2/eqo
 
 (run* (q)
       (eqo :pear :plum)
       (== true q))
+;; => ()
+
+;;===============================
+;;  page 23
+;;===============================
 
 (run* (q)
       (eqo :plum :plum)
       (== true q))
+;; => (true)
 
 (cons [:split] [:pea])
+;; => ([:split] :pea)
 
 (run* (r)
-      (fresh (x y)
-             (== (cons x (cons y [:salad])) r)))
+  (fresh (x y)
+    (== (cons x (cons y [:salad])) r)))
 
 (let [p (pair :pear [])]
   [p (nth p 0) (nth p 1) (.lhs p)])
@@ -274,7 +340,9 @@
 (mycons :split :pea)
 (mycons :split [])
 
-(defn pairo [p]             ;; this is a dodgy definition, see https://github.com/clojure/core.logic/wiki/Differences-from-The-Reasoned-Schemer
+(defn pairo [p]
+  ;; this is a dodgy definition, see
+  ;; https://github.com/clojure/core.logic/wiki/Differences-from-The-Reasoned-Schemer
   (fresh (a d)
          (conso a [d] p)))
 
