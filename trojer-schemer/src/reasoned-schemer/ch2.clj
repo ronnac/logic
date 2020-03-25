@@ -337,7 +337,17 @@
 ;; provides this behavior. llist is a
 ;; convenience macro that expands out
 ;; into nested lcons expressions.
+;; lcons "constructs a sequence a with
+;; an improper tail d if d is a logic
+;; variable"
+;; "Clojure's cons operator differs
+;; significantly from Scheme's so I
+;; (David Nolen) added the LConsSeq
+;; protocol. Sequences which end in a
+;; logic variables can be represented by
+;; using lcons"
 
+(lcons 'a (lvar 'b)) ; (a . <
 (defn pair? [x]
   (or
    (lcons? x)
