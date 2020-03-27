@@ -133,7 +133,9 @@
    1 7 0 2 3 0 0 8 5])
 )
 
-;;board is initialized with grounded lvars where we got hints and free lvars otherwise
+;; board is initialized with grounded
+;; lvars where we got hints and free
+;; lvars otherwise
 (defn init-board [vars hints]
   ;;check for emptiness
   (if 
