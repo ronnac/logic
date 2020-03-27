@@ -1,12 +1,76 @@
-/target
-/classes
-/checkouts
-profiles.clj
-pom.xml
-pom.xml.asc
-*.jar
-*.class
-/.lein-*
-/.nrepl-port
-.hgignore
-.hg/
+;; Connected to nREPL server - nrepl://localhost:44651
+;; CIDER 0.25.0snapshot (package: 20200308.1030), nREPL 0.7.0-beta1
+;; Clojure 1.10.1, Java 11.0.5
+;;     Docs: (doc function-name)
+;;           (find-doc part-of-name)
+;;   Source: (source function-name)
+;;  Javadoc: (javadoc java-object-or-class)
+;;     Exit: <C-c C-q>
+;;  Results: Stored in vars *1, *2, *3, an exception in *e;
+;; ======================================================================
+;; If you’re new to CIDER it is highly recommended to go through its
+;; manual first. Type <M-x cider-view-manual> to view it.
+;; In case you’re seeing any warnings you should consult the manual’s
+;; "Troubleshooting" section.
+;;
+;; Here are few tips to get you started:
+;;
+;; * Press <C-h m> to see a list of the keybindings available (this
+;;   will work in every Emacs buffer)
+;; * Press <, ,> to quickly invoke some REPL command
+;; * Press <, s a> to switch between the REPL and a Clojure file
+;; * Press <M-x cider-find-var> to jump to the source of something (e.g. a var, a
+;;   Java method)
+;; * Press <, h h> to view the documentation for something (e.g.
+;;   a var, a Java method)
+;; * Enable ‘eldoc-mode’ to display function & method signatures in the minibuffer.
+;; * Print CIDER’s refcard and keep it close to your keyboard.
+;;
+;; CIDER is super customizable - try <M-x customize-group cider> to
+;; get a feel for this. If you’re thirsty for knowledge you should try
+;; <M-x cider-drink-a-sip>.
+;;
+;; If you think you’ve encountered a bug (or have some suggestions for
+;; improvements) use <M-x cider-report-bug> to report it.
+;;
+;; Above all else - don’t panic! In case of an emergency - procure
+;; some (hard) cider and enjoy it responsibly!
+;;
+;; You can remove this message with the <M-x cider-repl-clear-help-banner> command.
+;; You can disable it from appearing on start by setting
+;; ‘cider-repl-display-help-banner’ to nil.
+;; ======================================================================
+;;  Startup: /bin/lein update-in :dependencies conj \[nrepl\ \"0.7.0-beta1\"\] -- update-in :plugins conj \[cider/cider-nrepl\ \"0.25.0-SNAPSHOT\"\] -- repl :headless :host localhost
+user> (ns logic-meichsner.core
+        (:refer-clojure :exclude [==])
+        (:use [clojure.core.logic])
+        (:require [clojure.core.logic.pldb :as facts])
+        (:require [clojure.core.logic.fd :as fd]))
+nil
+logic-meichsner.core> 
+logic-meichsner.core> 
+logic-meichsner.core> 3
+3Syntax error compiling at (src/logic_meichsner/core.clj:180:7).
+Unable to resolve symbol: init-board in this context
+Syntax error compiling at (src/logic_meichsner/core.clj:174:7).
+Unable to resolve symbol: init-board in this context
+(9 4 7 5 1 3 2 6 8)
+(5 3 1 6 2 8 9 4 7)
+(2 8 6 4 9 7 5 3 1)
+(3 9 2 7 4 1 8 5 6)
+(7 1 5 8 6 2 3 9 4)
+(4 6 8 3 5 9 7 1 2)
+(6 2 3 1 8 5 4 7 9)
+(8 5 4 9 7 6 1 2 3)
+(1 7 9 2 3 4 6 8 5)
+(9 4 7 5 1 3 2 6 8)
+(5 3 1 6 2 8 9 4 7)
+(2 8 6 4 9 7 5 3 1)
+(3 9 2 7 4 1 8 5 6)
+(7 1 5 8 6 2 3 9 4)
+(4 6 8 3 5 9 7 1 2)
+(6 2 3 1 8 5 4 7 9)
+(8 5 4 9 7 6 1 2 3)
+(1 7 9 2 3 4 6 8 5)
+
+logic-meichsner.core> ()

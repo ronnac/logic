@@ -1,4 +1,4 @@
-(ns logic.core
+(ns logic-meichsner.core
   (:refer-clojure :exclude [==])
   (:use [clojure.core.logic])
   (:require [clojure.core.logic.pldb :as facts])
@@ -138,40 +138,52 @@
 ;; lvars otherwise
 (defn init-board [vars hints]
   ;;check for emptiness
-  (if 
+  (if
     (seq vars)
     (let [hint (first hints)]
       (all
-        (if 
+        (if
           (zero? hint)
           succeed
           ;;else
           (== (first vars) hint))
-        (init-board (next vars) (next hints))))
+        (init-board
+         (next vars)
+         (next hints))))
     ;;else - emptiness
     succeed))
+;; => #'logic-meichsner.core/init-board
 
 ;;returns a square of 3x3 lvars starting at x:y
 (defn square [rows x y]
   (for [x (range x (+ x 3))
         y (range y (+ y 3))]
     (get-in rows [x y])))
+;; => #'logic-meichsner.core/square
 
 ;;workhorse
 (defn sodoku [hints]
   (let [board (repeatedly 81 lvar)
-        rows (->> board (partition 9) (map vec) (into []))
+        rows
+        (->> board
+             (partition 9)
+             (map vec) (into []))
         cols (apply map vector rows)
         squares (for [x (range 0 9 3)
                       y (range 0 9 3)]
                   (square rows x y))]
     (run 1 [q]
       (== q board)
-      (everyg #(fd/in % (fd/domain 1 2 3 4 5 6 7 8 9)) board)
+      (everyg
+       #(fd/in
+         %
+         (fd/domain 1 2 3 4 5 6 7 8 9))
+       board)
       (init-board board hints)
       (everyg fd/distinct rows)
       (everyg fd/distinct cols)
       (everyg fd/distinct squares))))
+;; => #'logic-meichsner.core/sodoku
 
 (def gotit
   (sodoku
@@ -184,11 +196,13 @@
      0 2 3 0 8 0 0 0 9
      8 0 0 9 0 0 1 2 0
      1 7 0 2 3 0 0 8 5]))
+;; => #'logic-meichsner.core/gotit
 
 ;;pretty print
 (doseq [r (partition 9 (first gotit))]
     (println r))
-  
+;; => nil
+
 
 
 
