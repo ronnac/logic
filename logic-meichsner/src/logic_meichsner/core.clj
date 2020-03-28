@@ -164,10 +164,10 @@
 ;;workhorse
 (defn sodoku [hints]
   (let [board (repeatedly 81 lvar)
-        rows
-        (->> board
-             (partition 9)
-             (map vec) (into []))
+        rows (->> board
+              (partition 9)
+              (map vec)
+              (into []))
         cols (apply map vector rows)
         squares (for [x (range 0 9 3)
                       y (range 0 9 3)]
