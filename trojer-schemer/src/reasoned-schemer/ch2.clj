@@ -337,17 +337,27 @@
 ;; provides this behavior. llist is a
 ;; convenience macro that expands out
 ;; into nested lcons expressions.
-;; lcons "constructs a sequence a with
-;; an improper tail d if d is a logic
-;; variable"
 ;; "Clojure's cons operator differs
 ;; significantly from Scheme's so I
 ;; (David Nolen) added the LConsSeq
 ;; protocol. Sequences which end in a
-;; logic variables can be represented by
+;; logic variable can be represented by
 ;; using lcons"
 
-(lcons 'a (lvar 'b)) ; (a . <
+;; (defn lcons
+;;  "Constructs a sequence a with an
+;; improper tail d if d is a logic
+;; variable."
+;;  [a d]
+;;  (if (or (coll? d) (nil? d))
+;;    (cons a (seq d))
+;;    (LCons. a d -1 nil)))
+;;
+;; deftype LCons cf https://github.com/clojure/core.logic/blob/44cf5a700afb57d7193c7592bcd2921815d01798/src/main/clojure/clojure/core/logic.clj#L737
+
+(lcons 'a (lvar 'b))
+;; => (a . <lvar:b__8932>)
+
 (defn pair? [x]
   (or
    (lcons? x)
@@ -359,7 +369,8 @@
 
 (pair? (llist '(split) 'pea))
 ;; => true
-                                        ; this works
+
+; this works
 (lcons '(split) 'pea)
 ;; => ((split) . pea)
 
@@ -376,12 +387,23 @@
 (first '(pear))
 ;; => pear
 
+;; ========================================
+;; p. 24
+;; ========================================
+
 (rest '(pear))
 ;; => ()
 
+;; how can we build a pair?
 (lcons '(split) 'pea)
 ;; => ((split) . pea)
 
+(run* (r)
+  (fresh (x y)
+    (== (lcons x (lcons y :salad)) r)))
+;; => ((_0 _1 . :salad))
+
+;; Definition a pairo
 (def pairo (fn [p]
              (fresh (a d)
                (conso a d p))))
@@ -397,6 +419,10 @@
   (== true q))
 ;; => ()
 
+;; ========================================
+;; p. 25
+;; ========================================
+
 (run* (q)
   (pairo 'pair)
   (== true q))
@@ -408,41 +434,54 @@
 
 (run* (r)
 (pairo (lcons r 'pear)))
+;; => (_0)
+
 (let [p (pair :pear [])]
   [p (nth p 0) (nth p 1) (.lhs p)])
+;; => [(:pear . []) :pear [] :pear]
 
 (defn mycons [a b]
   (if (coll? b)
     (cons a b)
     (pair a b)))
+;; => #'reasoned-schemer.ch2/mycons
 
 (mycons :split :pea)
+;; => (:split . :pea)
 (mycons :split [])
+;; => (:split)
 
 (defn pairo [p]
   ;; this is a dodgy definition, see
   ;; https://github.com/clojure/core.logic/wiki/Differences-from-The-Reasoned-Schemer
   (fresh (a d)
          (conso a [d] p)))
+;; => #'reasoned-schemer.ch2/pairo
 
 (run* (q)
       (pairo (cons q [q]))
       (== true q))
+;; => (true)
 
 (run* (q)
       (pairo [])
       (== true q))
+;; => ()
 
 (run* (q)
       (pairo :pair)
       (== true q))
+;; => ()
 
 (run* (x)
       (pairo x))
+;; => ((_0 _1))
 
 (run* (r)
       (pairo (cons r [:pear])))
+;; => (_0)
 
 (run* (r)
       (pairo [r :pear]))
+;; => (_0)
 
