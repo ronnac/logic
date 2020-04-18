@@ -5,6 +5,7 @@
 (defn pairo [p]
   (fresh [a d]
          (== (lcons a d) p)))
+;; => #'reasoned-schemer.ch3/pairo
 
 (defn listo [l]
   (conde
@@ -13,18 +14,67 @@
      (fresh (d)
             (resto l d)
             (listo d)))))
+;; => #'reasoned-schemer.ch3/listo
 
 (run* (x)
       (listo [:a :b x :d]))
+;; => (_0)
 
 (run 1 (x)
      (listo (llist :a :b :c x)))
+;; => (())
 
 (run 5 (x)
      (listo (llist :a :b :c x)))
+;; => (() (_0) (_0 _1) (_0 _1 _2) (_0 _1 _2 _3))
 
 (run* (x)
       (pairo [:a :b]))
+;; => (_0)
+;; ========================================
+;; p. 27
+;; ========================================
+
+;; Consider the definition of list?.
+;; reasoned-schemer.ch3> (source list?)
+;; (defn list?
+;;   [x] (instance?
+;;          clojure.lang.IPersistentList x)
+;; )
+
+(list? '('(:a)'(:a :b) :c))
+;; => true
+(list? '())
+;; => true
+(list? :s)
+;; => false
+(llist :date :s)
+;; => (:date . :s)
+(list? (llist :date :s))
+;; => false
+
+(defn listo [l]
+  (conde
+   [(emptyo l) s#]
+   [(pairo l)
+    (fresh [d]
+      (resto l d)
+      (listo d))]))
+;; => #'reasoned-schemer.ch3/listo
+
+;; ========================================
+;; p. 28
+;; ========================================
+;; Where does
+;; (fresh [d] (resto l d) (listo d))
+;; come from?
+;; It is an unnesting of (list? (cdr l)).
+;; First we take the cdr of l and associate
+;; it with a fresh variable d, and then we
+;; use d in the recursive call.
+
+
+
 
 ;; ---
 
