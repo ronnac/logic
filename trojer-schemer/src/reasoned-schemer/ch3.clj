@@ -91,30 +91,89 @@
   (listo (llist :a :b :c x)))
 ;; => (() (_0) (_0 _1) (_0 _1 _2) (_0 _1 _2 _3))
 
-;; ---
+;; In list? each cond line results in a
+;; value, whereas in listo each conde
+;; line results in a goal. To have each
+;; conde result in a goal, we unnest each
+;; cond question and each cond answer. Used
+;; with recursion, a conde expression can
+;; produce an unbounded number of values.
+;; We have used an upper bound, 5 in the
+;; previous frame, to keep from creating a
+;; list with an unbounded number of value
+
+;; ========================================
+;; p. 30
+;; ========================================
+
+
+;; Consider the definition of lol?, where
+;; lol? stands for list-of-lists?.
+(defn lol? [l]
+  (cond
+    (empty? l) true
+    (seq? (first l)) (lol? (rest l))
+    :else false))
+;; => #'reasoned-schemer.ch3/lol?
+;; As long as each top-level value in the
+;; list l is aproperlist, lol? returns
+;; true. Otherwise, lol? returns false.
+
+;; The definition of lol? has Boolean
+;; values as questions and answers. lolo
+;; has goals as questions and answers.
+;; Hence, it uses conde instead of cond.
+;; (seq? (first l)) and (lol? (rest l))
+;; have been unnested.
 
 (defn lolo [l]
   (conde
     ((emptyo l) s#)
     ((fresh (a)
-            (firsto l a)
-            (listo a))
+       (firsto l a)
+       (listo a))
      (fresh (d)
-            (resto l d)
-            (lolo d)))))
+       (resto l d)
+       (lolo d)))))
+;; => #'reasoned-schemer.ch3/lolo
 
-(run* (q)
+(run 1 (l) (lolo l))
+;; => (())
+;; Since l is fresh, (emptyo l) succeeds
+;; and in the process associates
+;; l with ().
+
+;; ========================================
+;; p. 31
+;; ========================================
+(run* (q) 
       (fresh (x y)
              (lolo [[:a :b] [x :c] [:d y]])
              (== true q)))
+;; => (true)
+;; since [[:a :b] [x :c] [:d y]] is a list
+;; of lists.
 
 (run 1 (q)
      (fresh (x)
             (lolo (llist [:a :b] x))
             (== true q)))
+;; => (true)
+;; because emotyo of a fresh variable
+;; always succeeds and associates the fresh
+;; variable, in this case x, with ().
+
+(run 1 (x)
+  (lolo (llist [:a :b] [:c :d] x))) 
+;; => (())
+;; since replacing x with the empty list
+;; in ([:a :b] [:c :d] x) transforms it to
+;; ([:a :b] [:c :d] '()),which is the same
+;; as ([:a :b] [:c :d]).
 
 (run 5 (x)
      (lolo (llist [:a :b] [:c :d] x)))      ;; hm...
+;; => (() (()) ((_0)) (() ()) ((_0 _1)))
 
 (defn twinso [s]
   (fresh (x y)
