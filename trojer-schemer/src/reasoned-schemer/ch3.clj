@@ -74,6 +74,23 @@
 ;; use d in the recursive call.
 
 
+;; The First Commandment
+;; To transform a function whose value is a
+;; Boolean into a function whose value is a
+;; goal, replace cond with conde and unnest
+;; each question and answer. Unnest the
+;; answer #t (or #f) by replacing it with
+;; #s (or #u).
+;; Why is 0 the value associated with x in
+(run* (x)
+  (listo (list 'a 'b x 'd)))
+;; => (_0)
+;; When determining the goal returned by
+;; list o, it is not necessary to determine
+;; the value of x. Therefore x remains
+;; fresh, which means that the goal
+;; returnedfrom the call to list o succeeds
+;; for all values associated with x.
 
 
 ;; ---
