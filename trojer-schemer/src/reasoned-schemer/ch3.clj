@@ -7,26 +7,6 @@
          (== (lcons a d) p)))
 ;; => #'reasoned-schemer.ch3/pairo
 
-(defn listo [l]
-  (conde
-    ((emptyo l) s#)
-    ((pairo l)
-     (fresh (d)
-            (resto l d)
-            (listo d)))))
-;; => #'reasoned-schemer.ch3/listo
-
-(run* (x)
-      (listo [:a :b x :d]))
-;; => (_0)
-
-(run 1 (x)
-     (listo (llist :a :b :c x)))
-;; => (())
-
-(run 5 (x)
-     (listo (llist :a :b :c x)))
-;; => (() (_0) (_0 _1) (_0 _1 _2) (_0 _1 _2 _3))
 
 (run* (x)
       (pairo [:a :b]))
@@ -81,9 +61,10 @@
 ;; each question and answer. Unnest the
 ;; answer #t (or #f) by replacing it with
 ;; #s (or #u).
+
 ;; Why is 0 the value associated with x in
 (run* (x)
-  (listo (list 'a 'b x 'd)))
+  (listo [:a :b x :d]))
 ;; => (_0)
 ;; When determining the goal returned by
 ;; list o, it is not necessary to determine
@@ -91,7 +72,24 @@
 ;; fresh, which means that the goal
 ;; returnedfrom the call to list o succeeds
 ;; for all values associated with x.
+;; When list o reaches the end of its
+;; argument, it succeeds. But x does not
+;; get associated with any value.
 
+
+;; ========================================
+;; p. 29
+;; ========================================
+
+(run 1 (x)
+  (listo (llist :a :b :c x)))
+;; => (())
+;; Because ((a b c . x)) is a proper list
+;; when x is the empty list.
+
+(run 5 (x)
+  (listo (llist :a :b :c x)))
+;; => (() (_0) (_0 _1) (_0 _1 _2) (_0 _1 _2 _3))
 
 ;; ---
 
