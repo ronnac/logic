@@ -170,45 +170,88 @@
 ;; in ([:a :b] [:c :d] x) transforms it to
 ;; ([:a :b] [:c :d] '()),which is the same
 ;; as ([:a :b] [:c :d]).
-
 (run 5 (x)
      (lolo (llist [:a :b] [:c :d] x)))      ;; hm...
 ;; => (() (()) ((_0)) (() ()) ((_0 _1)))
 
+(run 5 (x)
+    (lolo (llist '('a 'b) '('c 'd) x)))
+;; => (() (()) ((_0)) (() ()) ((_0 _1)))
+
+;; Is (tofu tofu) a twin? 
+;; Yes, because it is a list of two
+;; identical values.
+
+;; ========================================
+;; p. 32
+;; ========================================
+
+;; Is ((gg)(tofu tofu)) a list of twins?
+;; Yes, since both (gg) and (tofu tofu)
+;; are twins.
+
+; The definition in the book TRS, too long
 (defn twinso [s]
   (fresh (x y)
          (conso x y s)
          (conso x [] y)))
+;; => #'reasoned-schemer.ch3/twinso
 
+                                        ; T; The simpler definition
 (defn twinso2 [s]
   (fresh (x)
          (== [x x] s)))
+;; => #'reasoned-schemer.ch3/twinso2
 
 (run* (q)
       (twinso2 [:tofu :tofu])
       (== true q))
+;; => (true)
 
 (run* (z)
-      (twinso [z :tofu]))
+      (twinso2 [z :tofu]))
+;; => (:tofu)
 
+;; ========================================
+;; p. 33
+;; =======================================
+
+;lot stands for list-of-twins.
 (defn loto [l]
   (conde
     ((emptyo l) s#)
     ((fresh (a)
             (firsto l a)
-            (twinso a))
+            (twinso2 a))
      (fresh (d)
             (resto l d)
             (loto d)))))
+;; => #'reasoned-schemer.ch3/loto
 
 (run* (z)
      (loto [[:g :g] z]))
+;; => ([_0 _0])
+
+;; ========================================
+;; p. 34
+;; =======================================
+(run* (z)
+  (loto (pairo [[:g :g] z])))
+;; => ()
+
+(run 5 (z)
+  (loto (pairo [[:g :g] z])))
+;; => ()
 
 (run* (r)
      (fresh (w x y z)
             (loto [[:g :g] [:e w] [x y] z])
             (== [w [x y] z] r)))
+;; => ([:e [_0 _0] [_1 _1]])
 
+;; ========================================
+;; p. 35
+;; =======================================
 (defn listofo [predo l]
   (conde
     ((emptyo l) s#)
