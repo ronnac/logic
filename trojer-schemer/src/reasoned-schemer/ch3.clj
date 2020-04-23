@@ -194,10 +194,10 @@
 (defn twinso [s]
   (fresh (x y)
          (conso x y s)
-         (conso x [] y)))
+         (conso x '() y)))
 ;; => #'reasoned-schemer.ch3/twinso
 
-                                        ; T; The simpler definition
+; The simpler definition:
 (defn twinso2 [s]
   (fresh (x)
          (== [x x] s)))
@@ -222,7 +222,7 @@
     ((emptyo l) s#)
     ((fresh (a)
             (firsto l a)
-            (twinso2 a))
+            (twinso a))
      (fresh (d)
             (resto l d)
             (loto d)))))
@@ -230,7 +230,7 @@
 
 (run* (z)
      (loto [[:g :g] z]))
-;; => ([_0 _0])
+;; => ((_0 _0))
 
 ;; ========================================
 ;; p. 34
@@ -247,11 +247,14 @@
      (fresh (w x y z)
             (loto [[:g :g] [:e w] [x y] z])
             (== [w [x y] z] r)))
-;; => ([:e [_0 _0] [_1 _1]])
+;; => ([:e [_0 _0] (_1 _1)])
 
-;; ========================================
+;; =====================================
 ;; p. 35
-;; =======================================
+;; ====================================
+; helper function to build relationships
+; that describe lists of twins
+; predo is some predicate relationship
 (defn listofo [predo l]
   (conde
     ((emptyo l) s#)
@@ -261,14 +264,22 @@
      (fresh (d)
             (resto l d)
             (listofo predo d)))))
+;; => #'reasoned-schemer.ch3/listofo
 
 (run* (out)
-      (fresh (w x y z)
-             (== [[:g :g] [:e w] [x y] z] out)
-             (listofo twinso out)))
+    (fresh (w x y z)
+      (== [[:g :g] [:e w] [x y] z] out)
+      (listofo twinso out)))
+;; => ([[:g :g] [:e :e] [_0 _0] (_1 _1)])
 
-;; ---
 
+(defn loto2 [l]
+  (listofo twinso l))
+;; => #'reasoned-schemer.ch3/loto2
+
+;; =====================================
+;; p. 36
+;; ====================================
 (defn eq-caro [l x]
   (firsto l x))
 
