@@ -417,14 +417,17 @@
    [(fresh (d)
            (resto l d)
            (pmembero x d))]))
+;; => #'reasoned-schemer-clj.core/pmembero
 
 (run 5 [l]
       (pmembero 'tofu l))
+;; => ((tofu) (_0 tofu) (_0 _1 tofu) (_0 _1 _2 tofu) (_0 _1 _2 _3 tofu))
 
 ;this is not working like in the book: Only getting one true i.e. (true) instead of (true true)
 (run 5 [q]
      (pmembero 'tofu (list 'a 'b 'tofu 'd 'tofu))
      (== true q))
+;; => (true)
 
 (defn pmembero2 [x l]
   (conde
@@ -574,7 +577,7 @@
 
 (rember 'peas (list 'a 'b 'peas 'd 'peas 'e))
 
-(defn rembero [x l out]
+(defn rembero2 [x l out]
   (conde
    [(emptyo l) (== '() out)]
    [(firsto l x) (resto l out)]
@@ -586,7 +589,7 @@
                   (firsto l a)
                   (conso a res out)))]))
 
-(defn rembero [x l out]
+(defn rembero2 [x l out]
   (conde
    [(emptyo l) (== '() out)]
    [(firsto l x) (resto l out)]
@@ -596,7 +599,7 @@
            (firsto l a)
            (conso a res out))]))
 
-(defn rembero [x l out]
+(defn rembero22 [x l out]
   (conde
    [(emptyo l) (== '() out)]
    [(firsto l x) (resto l out)]
@@ -617,7 +620,7 @@
      (fresh (y z)
             (rembero y (list y 'd z 'e) (list y 'd 'e))
             (== (list y z) r)))
-
+22
 (run* [w]
      (fresh (y z out)
             (rembero y (llist 'a 'b y 'd z w) out)))

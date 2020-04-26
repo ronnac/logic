@@ -11,9 +11,9 @@
 (run* (x)
       (pairo [:a :b]))
 ;; => (_0)
-;; ========================================
+;; =====================================
 ;; p. 27
-;; ========================================
+;; =====================================
 
 ;; Consider the definition of list?.
 ;; reasoned-schemer.ch3> (source list?)
@@ -42,9 +42,9 @@
       (listo d))]))
 ;; => #'reasoned-schemer.ch3/listo
 
-;; ========================================
+;; =====================================
 ;; p. 28
-;; ========================================
+;; =====================================
 ;; Where does
 ;; (fresh [d] (resto l d) (listo d))
 ;; come from?
@@ -77,9 +77,9 @@
 ;; get associated with any value.
 
 
-;; ========================================
+;; =====================================
 ;; p. 29
-;; ========================================
+;; =====================================
 
 (run 1 (x)
   (listo (llist :a :b :c x)))
@@ -102,9 +102,9 @@
 ;; previous frame, to keep from creating a
 ;; list with an unbounded number of value
 
-;; ========================================
+;; =====================================
 ;; p. 30
-;; ========================================
+;; =====================================
 
 
 ;; Consider the definition of lol?, where
@@ -143,9 +143,9 @@
 ;; and in the process associates
 ;; l with ().
 
-;; ========================================
+;; =====================================
 ;; p. 31
-;; ========================================
+;; =====================================
 (run* (q) 
       (fresh (x y)
              (lolo [[:a :b] [x :c] [:d y]])
@@ -182,9 +182,9 @@
 ;; Yes, because it is a list of two
 ;; identical values.
 
-;; ========================================
+;; =====================================
 ;; p. 32
-;; ========================================
+;; =====================================
 
 ;; Is ((gg)(tofu tofu)) a list of twins?
 ;; Yes, since both (gg) and (tofu tofu)
@@ -212,9 +212,9 @@
       (twinso2 [z :tofu]))
 ;; => (:tofu)
 
-;; ========================================
+;; =====================================
 ;; p. 33
-;; =======================================
+;; ====================================
 
 ;lot stands for list-of-twins.
 (defn loto [l]
@@ -232,9 +232,9 @@
      (loto [[:g :g] z]))
 ;; => ((_0 _0))
 
-;; ========================================
+;; =====================================
 ;; p. 34
-;; =======================================
+;; =====================================
 (run* (z)
   (loto (pairo [[:g :g] z])))
 ;; => ()
@@ -252,9 +252,9 @@
 ;; =====================================
 ;; p. 35
 ;; ====================================
-; helper function to build relationships
-; that describe lists of twins
-; predo is some predicate relationship
+
+
+                                        ;
 (defn listofo [predo l]
   (conde
     ((emptyo l) s#)
@@ -282,60 +282,131 @@
 ;; ====================================
 (defn eq-caro [l x]
   (firsto l x))
+;; => #'reasoned-schemer.ch3/eq-caro
 
 (defn membero2 [x l]
-  (conde
-    ;;((emptyo l) u#)          ;; redundant
-    ((eq-caro l x) s#)
-    (s#                      ;; s# as else here, must be possible to do better?
-     (fresh (d)
-            (resto l d)
-            (membero2 x d)))))
+(conde
+ [(eq-caro l x) s#]
+ [(fresh (d)
+    (resto l d)
+    (membero2 x d))])
+  )
+;; => #'reasoned-schemer.ch3/membero2
 
 (run* (q)
-      (membero2 :olive [:virgin :olive :oil])
+  (membero2 :olive
+            [:virgin :olive :oil])
       (== true q))
+;; => (true)
 
 (run* (y)
       (membero2 y [:hummus :with :pita]))
+;; => (:hummus :with :pita)
 
 (defn identity2 [l]
   (run* [y]
         (membero y l)))
+;; => #'reasoned-schemer.ch3/identity2
 
 (identity2 [23 23])
+;; => (23 23)
 
 (run 1 (x)
      (membero :e [:pasta :e x :fagioli]))
+;; => (_0)
 
 (run 1 (x)
      (membero :e [:pasta x :e :fagioli]))
+;; => (:e)
 
+;; =====================================
+;; p. 39
+;; ====================================
 (run* (r)
-      (fresh (x y)
-             (membero :e [:pasta x :fagioli y])
-             (== [x y] r)))
+  (fresh (x y)
+      (membero :e [:pasta x :fagioli y])
+      (== [x y] r)))
+;; => ([:e _0] [_0 :e])
+
+
+(run 1 (l)
+  (membero :tofu l))
+;; => ((:tofu . _0))
+;; Every list whose first item is tofu.
 
 (run 5 (l)
-     (membero2 :tofu l))
+  (membero :tofu l))
+;; => ((:tofu . _0) (_0 :tofu . _1) (_0 _1 :tofu . _2) (_0 _1 _2 :tofu . _3) (_0 _1 _2 _3 :tofu . _4))
 
+;; ====================================
+;; p. 40
+;; ====================================
+
+; same function for proper lists
 (defn pmembero [x l]
   (conde
-    ((eq-caro l x) (resto l []))
-    ((eq-caro l x) (fresh (a d)
-                          (resto l [a d])))   ;; this line is wrong
-    (s# (fresh (d)
-               (resto l d)
-               (pmembero x d)))))
+    [(emptyo l) u#]   ;not in membero
+    [(eq-caro l x) (resto l '())]
+             ;2nd form ^ not im membero
+    [(fresh (d)
+        (resto l d)
+        (pmembero x d))])) 
+;; => #'reasoned-schemer.ch3/pmembero
+;; when we find x in l set rest of l
+;; empty
+
+;; ====================================
+;; p. 41
+;; ====================================
+(run* (q)
+  (pmembero :tofu
+            [:a :b :tofu :d :tofu])
+  (== true q))
+;; => (true)
+;; The test for being at the end of the
+;; list caused this definition to miss
+;; the first tofu.
+
+;; Here is a refined definition of
+;; pmembero.
+(defn pmembero [x l]
+  (conde
+   [(emptyo l) u#]
+   [(eq-caro l x) (resto l '())]
+   [(eq-caro l x) s#]
+   [(fresh (d)
+      (resto l d)
+      (pmembero x d))]))
+;; => #'reasoned-schemer.ch3/pmembero
 
 (run* (q)
-      (pmembero :tofu [:a :b :tofu :d :todu])
-      (== true q))
+  (pmembero :tofu
+            [:a :b :tofu :d :tofu])
+  (== true q))
+;; => (true true true
+;; The second conde line contributes a
+;; value because there is a tofu at the
+;; end of the list. Then the third conde
+;; line contributes a value for the
+;; first tofu in the list and it
+;; contributes a value for the second
+;; tofu in the list. Thus in all, three
+;; values are contributed.)
 
+
+
+
+
+
+(run 5 [l]
+  (pmembero 'tofu l))
+;; => ((tofu) (tofu . _0) (_0 tofu) (_0 tofu . _1) (_0 _1 tofu))
 ;; ---
 
 (defn first-value [l]
-  (run 1 (y)
-       (membero y l)))
+(run 1 (y)
+    (membero y l)))
+;; => #'reasoned-schemer.ch3/first-value
 
 (first-value [:pasta :e :fagioli])
+;; => (:pasta)
