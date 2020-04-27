@@ -383,7 +383,7 @@
   (pmembero :tofu
             [:a :b :tofu :d :tofu])
   (== true q))
-;; => (true true true
+;; => (true true true)
 ;; The second conde line contributes a
 ;; value because there is a tofu at the
 ;; end of the list. Then the third conde
@@ -391,21 +391,79 @@
 ;; first tofu in the list and it
 ;; contributes a value for the second
 ;; tofu in the list. Thus in all, three
-;; values are contributed.)
+;; values are contributed.
 
 
+;; ====================================
+;; p. 42
+;; ====================================
+
+;; Here is a more refined definition of
+;; pmembero. We have included a test to
+;; make sure that its rest is not the
+;; empty list. 
+(defn pmembero [x l]
+  (conde
+   [(emptyo l) u#]
+   [(eq-caro l x) (resto l '())]
+   [(eq-caro l x)
+    (fresh (a d) (resto l (llist a d)))]
+   [(fresh (d)
+      (resto l d)
+      (pmembero x d))]))
+;; => #'reasoned-schemer.ch3/pmembero
 
 
+(run* (q)
+  (pmembero :tofu
+            [:a :b :tofu :d :tofu])
+  (== true q))
+;; => (true true)
 
-
-(run 5 [l]
+(run 12 [l]
   (pmembero 'tofu l))
-;; => ((tofu) (tofu . _0) (_0 tofu) (_0 tofu . _1) (_0 _1 tofu))
-;; ---
+;; => ((tofu) (tofu _0 . _1) (_0 tofu) (_0 tofu _1 . _2) (_0 _1 tofu) (_0 _1 tofu _2 . _3) (_0 _1 _2 tofu) (_0 _1 _2 tofu _3 . _4) (_0 _1 _2 _3 tofu) (_0 _1 _2 _3 tofu _4 . _5) (_0 _1 _2 _3 _4 tofu) (_0 _1 _2 _3 _4 tofu _5 . _6))
+;; All of the odd positions are proper
+;; lists, because in the second conde
+;; line the rest of l is the empty list.
+;; The even positions are improper lists
+;; because in the third conde line the
+;; rest of l is a pair.
 
+;; ====================================
+;; p. 43
+;; ====================================
+
+;; How can we redefine pmembero so that
+;; the lists in the odd and even
+;; positions are swapped?
+;; We merely swap the first two conde
+;; lines of the simplified definition.
+(defn pmembero [x l]
+  (conde
+   [(eq-caro l x)
+    (fresh (a d) (resto l (llist a d)))]
+   [(eq-caro l x) (resto l '())]
+   [(fresh (d)
+      (resto l d)
+      (pmembero x d))]))
+;; => #'reasoned-schemer.ch3/pmembero
+
+
+(run 12 [l]
+  (pmembero 'tofu l))
+;; => ((tofu _0 . _1) (tofu) (_0 tofu _1 . _2) (_0 tofu) (_0 _1 tofu _2 . _3) (_0 _1 tofu) (_0 _1 _2 tofu _3 . _4) (_0 _1 _2 tofu) (_0 _1 _2 _3 tofu _4 . _5) (_0 _1 _2 _3 tofu) (_0 _1 _2 _3 _4 tofu _5 . _6) (_0 _1 _2 _3 _4 tofu))
+
+
+
+;; ====================================
+;; p. 44
+;; ====================================
 (defn first-value [l]
-(run 1 (y)
-    (membero y l)))
+(run 1are  (y)
+    (mresare tro y l)))
+;; => #'rresare tned-schemer.ch3/first-vresare t
+;; resare t'reasoned-schemer.ch3/first-vrest
 ;; => #'reasoned-schemer.ch3/first-value
 
 (first-value [:pasta :e :fagioli])
