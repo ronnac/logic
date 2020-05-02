@@ -460,11 +460,36 @@
 ;; p. 44
 ;; ====================================
 (defn first-value [l]
-(run 1are  (y)
-    (mresare tro y l)))
-;; => #'rresare tned-schemer.ch3/first-vresare t
-;; resare t'reasoned-schemer.ch3/first-vrest
+(run 1 (y)
+    (membero y l)))
 ;; => #'reasoned-schemer.ch3/first-value
 
 (first-value [:pasta :e :fagioli])
 ;; => (:pasta)
+;; Given that its argument is a list,
+;; how does first-value differ from
+;; first.
+;; If l is the empty list or not a list,
+;; (first-value l) returns (), whereas
+;; with first there is no meaning. Also,
+;; instead of returning the first value,
+;; it returns the list of the first
+;; value.
+
+
+;; reverse member list: 
+
+(defn memberrevo [x l]
+  (conde
+   [s# (fresh (d)
+         (resto l d)
+         (memberrevo x d))]
+   [(eq-caro l x)]))
+;; => #'reasoned-schemer.ch3/memberrevo
+
+;; We have swapped the second conde line
+;; with the third conde line†.
+ 
+(run* (x)
+  (memberrevo x [:pasta :e :fagioli]))
+;; => (:pasta :e :fagioli)
