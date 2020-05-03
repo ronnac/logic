@@ -84,19 +84,80 @@
 ;; be [:tofu :e].
 
 
-;; ---
+(run* (out) 
+  (fresh (x)
+    (memo :tofu
+          [:a :b x :d :tofu :e] out)))
+;; => ((:tofu :d :tofu :e) (:tofu :e))
+;;=====================================
+;; p. 50
+;;=====================================
 
-(defn rembero [x l out]
+(run 12 (z) 
+  (fresh (u)
+    (memo :tofu
+       (llist :a :b :tofu :d :tofu :e z)
+       u)))
+;; => (_0 _0 (:tofu . _0) (_0 :tofu . _1) (_0 _1 :tofu . _2) (_0 _1 _2 :tofu . _3) (_0 _1 _2 _3 :tofu . _4) (_0 _1 _2 _3 _4 :tofu . _5) (_0 _1 _2 _3 _4 _5 :tofu . _6) (_0 _1 _2 _3 _4 _5 _6 :tofu . _7) (_0 _1 _2 _3 _4 _5 _6 _7 :tofu . _8) (_0 _1 _2 _3 _4 _5 _6 _7 _8 :tofu . _9))
+;; How do we get the first two 0’s?
+;; The first 0 corresponds to finding
+;; the first tofu.The second 0
+;; corresponds to finding the second
+;; tofu.
+;; Where do the other ten lists come
+;; from? 
+;; In order for (memo :tofu (llist :a :b
+;; :tofu :d :tofu :e  z) u) to succeed,
+;; there must be a tofu in z. So memo
+;; creates all the possible lists with
+;; tofu as one element of the list.
+;;  That’s very interesting!
+
+
+;;=====================================
+;; p. 51
+;;=====================================
+;; rember means remove member
+;; it removes the first occurrence
+;; of a given list member
+
+(defn rember [x l]
+  (cond (nil? l) []
+         (= x (first l))(rest l)
+        :else
+         (cons (first l)
+               (rember x (rest l)))))
+;; => #'reasoned-schemer.ch4/rember
+
+(rember :peas [:a :b :peas :d :peas :e])
+;; => (:a :b :d :peas :e)
+
+(defn rembera [x l out]
   (conde
    ((emptyo l) (== out []))
    ((eq-caro l x) (resto l out))
    (s# (fresh (res)
-              (fresh (d)
-                     (resto l d)
-                     (rembero x d res))
-              (fresh (a)
-                     (resto l a)
-                     (conso a res out))))))
+          (fresh (d)
+                  (resto l d)
+                  (rembero x d res))
+          (fresh (a)
+                  (resto l a)
+                  (conso a res out))))))
+
+;; Why are there three freshes in
+;; (fresh (res)
+;;   (fresh (d)
+;;     (resto l d)
+;;     (rembero x d res))
+;;   (fresh (a)
+;;     (resto l a)
+;;     (conso a res out)))  ?
+
+;; Because d is only mentioned in
+;; (resto l d) and (rembero x d res)
+;; a is only mentioned in (firsto l a)
+;; and (conso a res out); but res is
+;; mentioned throughout.
 
 (defn rembero [x l out]
   (conde
@@ -118,14 +179,15 @@
               (conso a res out)))))
 
 (run* (out)
-     (fresh (y res)
-            (rembero :peas [:a :b y :d :peas :e] res)
-            (== out [y res])))
+  (fresh (y res)
+    (rembero :peas
+             [:a :b y :d :peas :e] res)
+    (== out [y res])))
 
 (run* (out)
-      (fresh (y z res)
-             (rembero y [:a :b y :d z :e] res)
-             (== out [y z res])))
+  (fresh (y z res)
+    (rembero y [:a :b y :d z :e] res)
+    (== out [y z res])))
 
 (run* (r)
       (fresh (y z)
