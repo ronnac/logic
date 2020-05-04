@@ -159,7 +159,10 @@
 ;; and (conso a res out); but res is
 ;; mentioned throughout.
 
-(defn rembero [x l out]
+;;=====================================
+;; p. 52
+;;=====================================
+(defn rembera [x l out]
   (conde
    ((emptyo l) (== out []))
    ((eq-caro l x) (resto l out))
@@ -168,8 +171,9 @@
               (rembero x d res)
               (firsto l a)
               (conso a res out)))))
+;; => #'reasoned-schemer.ch4/rembera
 
-(defn rembero [x l out]
+(defn rembera [x l out]
   (conde
    ((emptyo l) (== out []))
    ((eq-caro l x) (resto l out))
@@ -177,17 +181,24 @@
               (conso a d l)
               (rembero x d res)
               (conso a res out)))))
+;; => #'reasoned-schemer.ch4/rembera
 
 (run* (out)
   (fresh (y res)
-    (rembero :peas
+    (rembera :peas
              [:a :b y :d :peas :e] res)
     (== out [y res])))
+;; => ([:peas (:a :b :d :peas :e)] ([_0 (:a :b _0 :d :e)] :- (!= (_0 :peas))))
 
+;;=====================================
+;; p. 53
+;;=====================================
 (run* (out)
   (fresh (y z res)
     (rembero y [:a :b y :d z :e] res)
     (== out [y z res])))
+;; => ([:a _0 (:b :a :d _0 :e)] [:b _0 (:a :b :d _0 :e)] ([_0 _1 (:a :b :d _1 :e)] :- (!= (_0 :a)) (!= (_0 :b))) ([_0 _0 (:a :b _0 :d :e)] :- (!= (_0 _0)) (!= (_0 :d)) (!= (_0 :a)) (!= (_0 :b))))
+;; => ([:a _0 (:b :a :d _0 :e)] [:b _0 (:a :b :d _0 :e)] ([_0 _1 (:a :b :d _1 :e)] :- (!= (_0 :a)) (!= (_0 :b))) ([_0 _0 (:a :b _0 :d :e)] :- (!= (_0 _0)) (!= (_0 :d)) (!= (_0 :a)) (!= (_0 :b))))
 
 (run* (r)
       (fresh (y z)
