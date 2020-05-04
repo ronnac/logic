@@ -138,11 +138,11 @@
 ;; lvars otherwise
 (defn init-board [vars hints]
   ;;check for emptiness
-  (if 
+  (if
     (seq vars)
     (let [hint (first hints)]
       (all
-        (if 
+        (if
           (zero? hint)
           succeed
           ;;else
@@ -150,8 +150,10 @@
         (init-board (next vars) (next hints))))
     ;;else - emptiness
     succeed))
+;; => #'logic.core/init-board
 
-;;returns a square of 3x3 lvars starting at x:y
+;; returns a square of 3x3 lvars
+;; starting at x:y
 (defn square [rows x y]
   (for [x (range x (+ x 3))
         y (range y (+ y 3))]
