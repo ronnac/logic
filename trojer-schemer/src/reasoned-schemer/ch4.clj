@@ -202,6 +202,27 @@
 ;; ([_0 _1 (:a :b :d _1 :e)] :- (!= (_0 :a)) (!= (_0 :b)))
 ;; ([_0 _0 (:a :b _0 :d :e)] :- (!= (_0 _0)) (!= (_0 :d)) (!= (_0 :a)) (!= (_0 :b))))
 
+;; Why is (:b :a :d _0 :e) the first value?
+;; The b comes first because the a has been
+;; removed.
+;; In order to remove the a, y gets associated
+;; with a. The y in the list is then replaced
+;; with its value.
+
+;; Why is (:a :b :d _0 :e) the second value?
+;; In order to remove the a, y gets associated
+;; with a. The y in the list is then replaced
+;; with its value.
+
+;; Why is (:a :b :d _1 :e) the third value?
+;; The y has been removed.
+
+
+;; Why is (:a :b _0 :d :e) the fourth value?
+
+
+
+
 (run* (r)
     (fresh (y z)
         (rembera y [y :d z :e] [y :d :e])
