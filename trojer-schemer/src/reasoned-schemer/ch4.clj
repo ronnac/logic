@@ -168,7 +168,7 @@
    ((eq-caro l x) (resto l out))
    (s# (fresh (a d res)
               (resto l d)
-              (rembero x d res)
+              (rembera x d res)
               (firsto l a)
               (conso a res out)))))
 ;; => #'reasoned-schemer.ch4/rembera
@@ -179,7 +179,7 @@
    ((eq-caro l x) (resto l out))
    (s# (fresh (a d res)
               (conso a d l)
-              (rembero x d res)
+              (rembera x d res)
               (conso a res out)))))
 ;; => #'reasoned-schemer.ch4/rembera
 
@@ -188,19 +188,22 @@
     (rembera :peas
              [:a :b y :d :peas :e] res)
     (== out [y res])))
-;; => ([:peas (:a :b :d :peas :e)] ([_0 (:a :b _0 :d :e)] :- (!= (_0 :peas))))
+;; => ([:peas (:a :b :d :peas :e)] [_0 (:a :b _0 :d :e)] [_0 (:a :b _0 :d :peas :e)])
 
 ;;=====================================
 ;; p. 53
 ;;=====================================
 (run* (out)
   (fresh (y z res)
-    (rembero y [:a :b y :d z :e] res)
+    (rembera y [:a :b y :d z :e] res)
     (== out [y z res])))
 ;; => ([:a _0 (:b :a :d _0 :e)]
 ;; [:b _0 (:a :b :d _0 :e)]
-;; ([_0 _1 (:a :b :d _1 :e)] :- (!= (_0 :a)) (!= (_0 :b)))
-;; ([_0 _0 (:a :b _0 :d :e)] :- (!= (_0 _0)) (!= (_0 :d)) (!= (_0 :a)) (!= (_0 :b))))
+;; [_0 _1 (:a :b :d _1 :e)]
+;; [:d _0 (:a :b :d _0 :e)]
+;; [_0 _0 (:a :b _0 :d :e)]
+;; [:e _0 (:a :b :e :d _0)]
+;; [_0 _1 (:a :b _0 :d _1 :e)])
 
 ;; Why is (:b :a :d _0 :e) the first value?
 ;; The b comes first because the a has been
@@ -219,15 +222,14 @@
 
 
 ;; Why is (:a :b _0 :d :e) the fourth value?
-
-
+;; I don't understand this. 
 
 
 (run* (r)
     (fresh (y z)
         (rembera y [y :d z :e] [y :d :e])
         (== [y z] r)))
-;; rembera ==> ([:d :d] [:d :d] ([_0 _0] :- (!= (_0 :d))))
+;; rembera => ([:d :d] [:d :d] [_0 _0] [:a :e])
 ;; core.logic/rembero => ([:d :d])
 ;; so rembera yields wrong solutions !!
 
