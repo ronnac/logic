@@ -139,10 +139,10 @@
    (s# (fresh (res)
           (fresh (d)
                   (resto l d)
-                  (rembero x d res))
+                  (rembera x d res))
           (fresh (a)
-                  (resto l a)
-                  (conso a res out))))))
+                (resto l a)
+                (conso a res out))))))
 
 ;; Why are there three freshes in
 ;; (fresh (res)
@@ -163,9 +163,9 @@
 ;; p. 52
 ;;=====================================
 (defn rembera [x l out]
-  (conde
-   ((emptyo l) (== out []))
-   ((eq-caro l x) (resto l out))
+(conde
+  ((emptyo l) (== out []))
+  ((eq-caro l x) (resto l out))
    (s# (fresh (a d res)
               (resto l d)
               (rembera x d res)
@@ -229,9 +229,32 @@
     (fresh (y z)
         (rembera y [y :d z :e] [y :d :e])
         (== [y z] r)))
-;; rembera => ([:d :d] [:d :d] [_0 _0] [:a :e])
+;; => ([:d :d] [:d :d] [_0 _0] [:e :e])
 ;; core.logic/rembero => ([:d :d])
-;; so rembera yields wrong solutions !!
+;; Why is [:d :d] the first value?
+;; When y is :d and z is :d, then
+;; (rembera :d [:d :d :d :e][:d :d :e])
+;; succeeds.
+
+;; Why is [:d :d] the second value?
+;; => same answer
+
+;; Why is [_0 _0] the third value?
+;; rembera removes z from the list [y :d z :e]
+;; ,yielding the list [y :d :e]; [y :d :e] is
+;; always the same as out, [y :d :e]. Also, in
+;; order to remove the z, y gets associated
+;; with z,so they co-refer.
+;; As long as y and z are the same, y can be
+;; anything.
+
+;; How is [:e :e] the fourth value?
+;; rembero removes :e from the list
+;; [y :d z :e], yielding the list [y :d z]
+;; [y :d z] is the same as out, [y :d :e],
+;; only when z is e. Also, in order to remove
+;; the :e, y gets associated with :e.
+
 
 (run 13 (w)
      (fresh (y z out)
@@ -253,10 +276,13 @@
 
 (defn surpriseo [s]
   (rembero s [:a :b :c] [:a :b :c]))
+;; => #'reasoned-schemer.ch4/surpriseo
 
 (run* (r)
      (surpriseo r))
+;; => ()
 
 (run* (r)               ;; wtf!!!
       (surpriseo r)
       (== :b r))
+;; => ()
