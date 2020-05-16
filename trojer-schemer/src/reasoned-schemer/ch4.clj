@@ -257,20 +257,67 @@
 
 
 (run 13 (w)
-     (fresh (y z out)
-            (rembero y (llist :a :b y :d z w) out)))
-;; => (_0 _0
-;; (_0 :- (!= (_1 :a)) (!= (_1 :b)))
-;; (_0 :- (!= (_1 _1)) (!= (_1 :d)) (!= (_1 :a)) (!= (_1 :b)))
-;; ((_0 . _1) :- (!= (_0 _0)) (!= (_2 _0)) (!= (_0 :d)) (!= (_0 :a)) (!= (_0 :b)))
-;; ((_0 _1 . _2) :- (!= (_1 _1)) (!= (_1 :d)) (!= (_1 :a)) (!= (_1 :b)) (!= (_0 _1)) (!= (_3 _1)))
-;; ((_0 _1 _2 . _3) :- (!= (_1 _2)) (!= (_4 _2)) (!= (_2 :a)) (!= (_2 _2)) (!= (_2 :d)) (!= (_2 :b)) (!= (_0 _2)))
-;; ((_0 _1 _2 _3 . _4) :- (!= (_3 :d)) (!= (_2 _3)) (!= (_3 _3)) (!= (_3 :a)) (!= (_1 _3)) (!= (_3 :b)) (!= (_5 _3)) (!= (_0 _3)))
-;; ((_0 _1 _2 _3 _4 . _5) :- (!= (_2 _4)) (!= (_4 :b)) (!= (_4 :d)) (!= (_0 _4)) (!= (_4 :a)) (!= (_1 _4)) (!= (_4 _4)) (!= (_6 _4)) (!= (_3 _4)))
-;; ((_0 _1 _2 _3 _4 _5 . _6) :- (!= (_2 _5)) (!= (_3 _5)) (!= (_0 _5)) (!= (_5 :a)) (!= (_7 _5)) (!= (_5 :d)) (!= (_1 _5)) (!= (_5 _5)) (!= (_4 _5)) (!= (_5 :b)))
-;; ((_0 _1 _2 _3 _4 _5 _6 . _7) :- (!= (_6 :a)) (!= (_0 _6)) (!= (_1 _6)) (!= (_4 _6)) (!= (_8 _6)) (!= (_5 _6)) (!= (_6 _6)) (!= (_2 _6)) (!= (_3 _6)) (!= (_6 :b)) (!= (_6 :d)))
-;; ((_0 _1 _2 _3 _4 _5 _6 _7 . _8) :- (!= (_6 _7)) (!= (_7 :a)) (!= (_2 _7)) (!= (_9 _7)) (!= (_1 _7)) (!= (_3 _7)) (!= (_5 _7)) (!= (_4 _7)) (!= (_7 _7)) (!= (_0 _7)) (!= (_7 :b)) (!= (_7 :d)))
-;; ((_0 _1 _2 _3 _4 _5 _6 _7 _8 . _9) :- (!= (_7 _8)) (!= (_8 :b)) (!= (_2 _8)) (!= (_4 _8)) (!= (_8 :a)) (!= (_6 _8)) (!= (_1 _8)) (!= (_8 :d)) (!= (_8 _8)) (!= (_0 _8)) (!= (_5 _8)) (!= (_3 _8)) (!= (_10 _8))))
+   (fresh (y z out)
+      (rembera y (llist :a :b y :d z w) out)))
+;; =>
+;;(_0
+;; _0
+;; _0
+;; _0
+;; _0
+;; ()
+;; (_0 . _1)
+;; (_0)
+;; (_0 _1 . _2)
+;; (_0 _1)
+;; (_0 _1 _2 . _3)
+;; (_0 _1 _2)
+;; (_0 _1 _2 _3 . _4))
+
+;; Why is _0 the first value?
+;; When y is :a, out becomes ((b y d z ! w)),
+;; which makes
+;; (rembera y (a b y d z . w)(b y d z . w))
+;; succeed
+
+;; How is _0 the 2nd, 3rd, and 4th value?
+;: This is the same as in the previous frame,
+;; except that rembera removes b from the
+;; original l, y from the original l, and d
+;; from the original l,respectively.
+
+;; How is _0 the fifth value?
+;; Next, rembero removes z from l. When the
+;; (eq-caro l x) question of the second conde
+;; line succeeds, (car l) is z. The answer of
+;; the second conde line, (cdro l out), also
+;; succeeds, associating the cdr of l (the
+;; fresh variable w) with the fresh variable
+;; out. The variable out, however, is just
+;; res, the fresh variable passed into the
+;; recursive call to rembero.
+
+;; How is () the sixth value?
+;; Because none of the first five values in l
+;; are removed. The (emptyo l) question of the
+;; first conde line then succeeds, associating;; w with the empty list.
+
+;; How is (0 . 1) the seventh value?
+;; Because none of the first five values in l
+;; are removed, and because we pretend that
+;; the (emptyo l) question of the first conde
+;; line fails. The (eq-caro l x) question of
+;; the second conde line succeeds, however,
+;; and associates w with a pair whose car is y
+;; . The answer (cdro l out) of the second
+;; conde line also succeeds, associating w
+;; with a pair whose cdr is out.The variable
+;; out, however, is just res, the fresh
+;; variable passed into the recursive call to
+;; rembero. During the recursion, the caro
+;; inside the second conde line’s eq-caro
+;; associates the fresh variable y with the
+;; fresh variable a.
 
 ;; ---
 
